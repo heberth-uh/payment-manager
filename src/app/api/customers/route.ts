@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@lib/prisma";
 
+// Get all customers
 export async function GET(request: NextRequest) {
   try {
     const customers = await prisma.customer.findMany();
@@ -13,6 +14,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// Create a new customer
 export async function POST(request: NextRequest) {
   try {
     const { name, lastname, phone, address } = await request.json();
@@ -22,10 +24,14 @@ export async function POST(request: NextRequest) {
         name,
         lastname,
         phone,
-        address
-      }
+        address,
+        // TODO: add CreatedBy column
+      },
     });
-    return Response.json({ message: "Customer created successfully", data: result }, { status: 201 });
+    return Response.json(
+      { message: "Customer created successfully", data: result },
+      { status: 201 }
+    );
   } catch (error) {
     if (error instanceof Error) {
       return Response.json({ message: error.message }, { status: 500 });
