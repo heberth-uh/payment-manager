@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@lib/prisma";
+import { handleApiError } from "@/lib/utils/api-error";
 
 // Get all customers
 export async function GET(request: NextRequest) {
@@ -7,10 +8,7 @@ export async function GET(request: NextRequest) {
     const customers = await prisma.customer.findMany();
     return Response.json({ data: customers }, { status: 200 });
   } catch (error) {
-    if (error instanceof Error) {
-      return Response.json({ message: error.message }, { status: 500 });
-    }
-    return Response.json({ message: "Internal Server Error" }, { status: 500 });
+    return handleApiError(error);
   }
 }
 
@@ -33,9 +31,6 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    if (error instanceof Error) {
-      return Response.json({ message: error.message }, { status: 500 });
-    }
-    return Response.json({ message: "Internal Server Error" }, { status: 500 });
+    return handleApiError(error);
   }
 }
