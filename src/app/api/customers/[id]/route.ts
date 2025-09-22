@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
 import { NextRequest, NextResponse } from "next/server";
 
-// Get one single customer
+// Get a customer
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -32,10 +32,28 @@ export async function PUT(
       where: { id: params.id },
       data: body,
     });
-    return Response.json(
-      { message: "Customer updated successfully", data: result },
-      { status: 200 }
-    );
+    return NextResponse.json({
+      message: "Customer updated successfully",
+      data: result,
+    });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Delete a customer
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const result = await prisma.customer.delete({
+      where: { id: params.id },
+    });
+    return NextResponse.json({
+      message: "Customer deleted successfully",
+      data: result,
+    });
   } catch (error) {
     return handleApiError(error);
   }

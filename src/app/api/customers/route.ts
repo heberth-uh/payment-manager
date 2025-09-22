@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
 
@@ -6,7 +6,7 @@ import { handleApiError } from "@/lib/utils/api-error";
 export async function GET(request: NextRequest) {
   try {
     const customers = await prisma.customer.findMany();
-    return Response.json({ data: customers }, { status: 200 });
+    return NextResponse.json({ data: customers }, { status: 200 });
   } catch (error) {
     return handleApiError(error);
   }
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         // TODO: add CreatedBy column
       },
     });
-    return Response.json(
+    return NextResponse.json(
       { message: "Customer created successfully", data: result },
       { status: 201 }
     );
