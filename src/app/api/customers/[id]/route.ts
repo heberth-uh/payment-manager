@@ -13,6 +13,13 @@ export async function GET(
       where: { id },
     });
 
+    if (!result) {
+      return NextResponse.json(
+        { message: "Cliente no encontrado" },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json(
       { message: "Customer retrieved successfully", data: result },
       { status: 200 }
