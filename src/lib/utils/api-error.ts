@@ -1,7 +1,9 @@
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
+import z from "zod";
 
 export function handleApiError(error: unknown) {
+  // Prisma known errors
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     switch (error.code) {
       case "P2025":
@@ -22,6 +24,15 @@ export function handleApiError(error: unknown) {
     }
   }
 
+  // Zod validation error
+  if (error instanceof z.ZodError) {
+    return NextResponse.json(
+      { message: "Error de validación", errors: error.issues },
+      { status: 400 }
+    );
+  }
+
+  // Generic or unknown error
   if (error instanceof Error) {
     return NextResponse.json({ message: error.message }, { status: 500 });
   }

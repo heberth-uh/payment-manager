@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
+import { CreateCustomerSchema } from "@/lib/validations/customer.schema";
 
 // Get all customers
 export async function GET(request: NextRequest) {
@@ -26,17 +27,10 @@ export async function GET(request: NextRequest) {
 // Create a new customer
 export async function POST(request: NextRequest) {
   try {
-    const { name, lastname, phone, address } = await request.json();
-
-    const result = await prisma.customer.create({
-      data: {
-        name,
-        lastname,
-        phone,
-        address,
-        // TODO: add CreatedBy column
-      },
-    });
+    const body = await request.json();
+    // Validate the request body
+    const data = CreateCustomerSchema.parse(body);
+    const result = await prisma.customer.create({ data });
     return NextResponse.json(
       { message: "Customer created successfully", data: result },
       { status: 201 }
