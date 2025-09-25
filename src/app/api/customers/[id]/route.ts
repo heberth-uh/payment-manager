@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
+import { UpdateCustomerSchema } from "@/lib/validations/customer.schema";
 import { NextRequest, NextResponse } from "next/server";
 
 // Get a customer
@@ -35,12 +36,17 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const body = await request.json();
     const { id } = await params;
+    const body = await request.json();
+
+    // Validate the request body
+    const data = UpdateCustomerSchema.parse(body);
+
     const result = await prisma.customer.update({
       where: { id },
-      data: body,
+      data,
     });
+
     return NextResponse.json({
       message: "Customer updated successfully",
       data: result,
