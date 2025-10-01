@@ -64,7 +64,7 @@ export function SignupForm({
       email,
       password,
       name,
-      callbackURL: "/email-verified",
+      callbackURL: "/",
     });
 
     if (error) {
