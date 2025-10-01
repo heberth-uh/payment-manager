@@ -57,9 +57,8 @@ export function SignupForm({
   });
 
   async function onSubmit({ name, email, password }: SignUpValues) {
-    // Handle sign up logic here
-    console.log("signing up...");
     setError(null);
+
     const { error } = await authClient.signUp.email({
       email,
       password,
