@@ -120,7 +120,7 @@ export function SignupForm({
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Username</FormLabel>
+                        <FormLabel>Full Name</FormLabel>
                         <FormControl>
                           <Input placeholder="shadcn" {...field} />
                         </FormControl>
