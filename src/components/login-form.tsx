@@ -49,7 +49,6 @@ export function LoginForm({
   });
 
   async function onSubmit({ email, password }: SignInValues) {
-    console.log("logging in...");
     setError(null);
     try {
       const result = await authClient.signIn.email({
