@@ -8,28 +8,17 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ---------- Customer ----------
-
-model Customer {
-  id        String   @id @default(cuid())
-  name      String
-  lastname  String?
-  phone     String?
-  address   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model User {
-  id            String    @id
+  id            String     @id
   name          String
   email         String
-  emailVerified Boolean   @default(false)
+  emailVerified Boolean    @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @default(now()) @updatedAt
   sessions      Session[]
   accounts      Account[]
+  customers     Customer[]
 
   @@unique([email])
   @@map("user")
@@ -78,4 +67,21 @@ model Verification {
   updatedAt  DateTime @default(now()) @updatedAt
 
   @@map("verification")
+}
+
+// ---------- Customer ----------
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  lastname  String?
+  phone     String?
+  address   String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("customer")
 }
