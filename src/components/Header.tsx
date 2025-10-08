@@ -8,6 +8,7 @@ import Link from "next/link";
 
 function Header() {
   const router = useRouter();
+  const { data: session } = authClient.useSession();
 
   const handleSignOut = async () => {
     const { error } = await authClient.signOut({
@@ -28,13 +29,16 @@ function Header() {
       <div className="container mx-auto">
         <div className="flex items-center justify-between">
           <Link href={"/"}>Payment Manager</Link>
-          <button
-            type="button"
-            className="bg-gray-100 py-1 px-3 rounded-sm border border-gray-300 cursor-pointer"
-            onClick={handleSignOut}
-          >
-            Sign Out
-          </button>
+
+          {session?.user && (
+            <button
+              type="button"
+              className="bg-gray-100 py-1 px-3 rounded-sm border border-gray-300 cursor-pointer"
+              onClick={handleSignOut}
+            >
+              Sign Out
+            </button>
+          )}
         </div>
       </div>
     </header>
