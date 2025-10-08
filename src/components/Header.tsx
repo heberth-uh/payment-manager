@@ -5,6 +5,7 @@ import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
+import Navbar from "./Navbar";
 
 function Header() {
   const router = useRouter();
@@ -30,15 +31,18 @@ function Header() {
         <div className="flex items-center justify-between">
           <Link href={"/"}>Payment Manager</Link>
 
-          {session?.user && (
-            <button
-              type="button"
-              className="bg-gray-100 py-1 px-3 rounded-sm border border-gray-300 cursor-pointer"
-              onClick={handleSignOut}
-            >
-              Sign Out
-            </button>
-          )}
+          <div className="flex items-center gap-5">
+            <Navbar />
+            {session?.user && (
+              <button
+                type="button"
+                className="bg-gray-100 py-1 px-3 rounded-sm border border-gray-300 cursor-pointer"
+                onClick={handleSignOut}
+              >
+                Sign Out
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </header>
