@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
 import { CreateCustomerSchema } from "@/lib/validations/customer.schema";
+import { getServerSession } from "@/lib/get-session";
 
 // Get all customers
 export async function GET(request: NextRequest) {
@@ -30,11 +31,21 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    const session = await getServerSession();
+
+    if (!session?.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
 
     // Validate the request body
-    const data = CreateCustomerSchema.parse(body);
+    const parsedData = CreateCustomerSchema.parse(body);
 
-    const result = await prisma.customer.create({ data });
+    const result = await prisma.customer.create({
+      data: {
+        ...parsedData,
+        userId: session.user.id,
+      },
+    });
 
     return NextResponse.json(
       { message: "Customer created successfully", data: result },
