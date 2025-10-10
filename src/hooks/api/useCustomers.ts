@@ -1,29 +1,41 @@
 "use client";
 
 import { Customer } from "@prisma/client";
-import axios from "axios";
 import { useEffect, useState } from "react";
 
 export const useCustomers = () => {
   const [data, setData] = useState<Customer[]>([]);
-  const [error, setError] = useState<Error | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const getCustomers = async () => {
+    const controller = new AbortController();
+    setLoading(true);
+    setError(null);
+
+    try {
+      // TODO: Add search to the request later
+
+      const response = await fetch("/api/customers");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al obtener clientes");
+      }
+      const result = await response.json();
+      setData(result.data);
+    } catch (error) {
+      // TODO: Create client error handler
+      setError(error instanceof Error ? error.message : "Error desconocido");
+    } finally {
+      setLoading(false);
+    }
+
+    return () => controller.abort();
+  };
 
   useEffect(() => {
-    const getCustomers = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get("/api/customers");
-        setData(response.data.data);
-      } catch (error) {
-        setError(error as Error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     getCustomers();
   }, []);
 
-  return { data, error, loading };
+  return { data, error, loading, refetch: getCustomers };
 };
