@@ -1,5 +1,6 @@
 "use client";
 
+import { handleClientError } from "@/lib/utils/client-error";
 import { Customer } from "@prisma/client";
 import { useEffect, useState } from "react";
 
@@ -24,8 +25,7 @@ export const useCustomers = () => {
       const result = await response.json();
       setData(result.data);
     } catch (error) {
-      // TODO: Create client error handler
-      setError(error instanceof Error ? error.message : "Error desconocido");
+      setError(handleClientError(error));
     } finally {
       setLoading(false);
     }
