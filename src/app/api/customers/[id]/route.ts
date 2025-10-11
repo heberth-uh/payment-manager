@@ -1,3 +1,4 @@
+import { getServerSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
 import { UpdateCustomerSchema } from "@/lib/validations/customer.schema";
@@ -10,6 +11,12 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    const session = await getServerSession();
+
+    if (!session?.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
     const result = await prisma.customer.findUnique({
       where: { id },
     });
@@ -38,6 +45,11 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
+    const session = await getServerSession();
+
+    if (!session?.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
 
     // Validate the request body
     const data = UpdateCustomerSchema.parse(body);
@@ -63,6 +75,12 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+    const session = await getServerSession();
+
+    if (!session?.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
     const result = await prisma.customer.delete({
       where: { id },
     });
