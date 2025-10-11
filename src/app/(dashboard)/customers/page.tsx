@@ -4,6 +4,7 @@ import { PageContainer } from "@/components/PageContainer";
 import React from "react";
 import { useCustomers } from "@/hooks/api/useCustomers";
 import { RefreshCw } from "lucide-react";
+import Link from "next/link";
 
 function CustomersPage() {
   const { data, error, loading, refetch } = useCustomers();
@@ -30,7 +31,12 @@ function CustomersPage() {
         <div className="mt-4">
           <ul>
             {data?.map((customer) => (
-              <li key={customer.id}>{customer.name}</li>
+              <li key={customer.id}>
+                <Link href={`/customers/${customer.id}`}>
+                  {customer.name}
+                  {customer.lastname && ` ${customer.lastname}`}
+                </Link>
+              </li>
             ))}
           </ul>
         </div>

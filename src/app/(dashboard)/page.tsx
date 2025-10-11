@@ -1,5 +1,5 @@
 import { getServerSession } from "@/lib/get-session";
-import Unauthorized from "./unauthorized";
+import Unauthorized from "../unauthorized";
 import { PageContainer } from "@/components/PageContainer";
 
 export default async function Home() {
