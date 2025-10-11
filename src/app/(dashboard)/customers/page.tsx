@@ -7,7 +7,7 @@ import { RefreshCw } from "lucide-react";
 import Link from "next/link";
 
 function CustomersPage() {
-  const { data, error, loading, refetch } = useCustomers();
+  const { data, loading, error, refetch } = useCustomers();
 
   if (error) {
     return <PageContainer>Error {error}</PageContainer>;

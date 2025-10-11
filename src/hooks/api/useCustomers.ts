@@ -37,5 +37,40 @@ export const useCustomers = () => {
     getCustomers();
   }, []);
 
-  return { data, error, loading, refetch: getCustomers };
+  return { data, loading, error, refetch: getCustomers };
+};
+
+// Get a customer by id
+export const useCustomer = (customerId: string) => {
+  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const getCustomer = async () => {
+    const controller = new AbortController();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`/api/customers/${customerId}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al obtener cliente");
+      }
+      const result = await response.json();
+      setCustomer(result.data);
+    } catch (error) {
+      setError(handleClientError(error));
+    } finally {
+      setLoading(false);
+    }
+
+    return () => controller.abort();
+  };
+
+  useEffect(() => {
+    getCustomer();
+  }, [customerId]);
+
+  return { customer, loading, error, refetch: getCustomer };
 };
