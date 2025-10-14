@@ -5,6 +5,7 @@ import React from "react";
 import { useCustomers } from "@/hooks/api/useCustomers";
 import { RefreshCw } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 function CustomersPage() {
   const { data, loading, error, refetch } = useCustomers();
@@ -17,12 +18,14 @@ function CustomersPage() {
     <PageContainer>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl">Clientes</h1>
-        <button
-          onClick={() => refetch()}
-          className="bg-gray-200 p-2 rounded-md"
-        >
-          <RefreshCw className="size-4" />
-        </button>
+        <div className="flex items-center gap-2">
+          <Button onClick={() => refetch()} variant={"secondary"}>
+            <RefreshCw className="size-4" />
+          </Button>
+          <Button>
+            <Link href={'customers/new'}>Nuevo</Link>
+          </Button>
+        </div>
       </div>
 
       {loading ? (
