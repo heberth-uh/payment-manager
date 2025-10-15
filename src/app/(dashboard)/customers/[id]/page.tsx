@@ -1,6 +1,6 @@
 "use client";
 
-import { useCustomer } from "@/hooks/api/useCustomers";
+import { useCustomers } from "@/hooks/api/useCustomers";
 import { MapPin, Phone, RefreshCw } from "lucide-react";
 import { useParams } from "next/navigation";
 import React from "react";
@@ -10,7 +10,10 @@ function CustomerPage() {
   const customerId = Array.isArray(params.id) ? params.id[0] : params.id;
 
   if (!customerId) return <p>El ID del cliente es inválido</p>;
-  const { customer, loading, error, refetch } = useCustomer(customerId);
+  const { customer, loading, error, getCustomer } = useCustomers({
+    autoFetch: true,
+    customerId,
+  });
 
   if (error) return <p>{error}</p>;
 
@@ -23,7 +26,7 @@ function CustomerPage() {
           {`${customer?.name}${" " + customer?.lastname}`}
         </h1>
         <button
-          onClick={() => refetch()}
+          onClick={() => getCustomer(customerId)}
           className="bg-gray-200 p-2 rounded-md"
         >
           <RefreshCw className="size-4" />

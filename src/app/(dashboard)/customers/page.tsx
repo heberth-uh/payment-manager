@@ -8,7 +8,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 function CustomersPage() {
-  const { data, loading, error, refetch } = useCustomers();
+  const { customers, loading, error, getCustomers } = useCustomers({
+    autoFetch: true,
+  });
 
   if (error) {
     return <PageContainer>Error {error}</PageContainer>;
@@ -19,11 +21,11 @@ function CustomersPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl">Clientes</h1>
         <div className="flex items-center gap-2">
-          <Button onClick={() => refetch()} variant={"secondary"}>
+          <Button onClick={() => getCustomers()} variant={"secondary"}>
             <RefreshCw className="size-4" />
           </Button>
           <Button>
-            <Link href={'customers/new'}>Nuevo</Link>
+            <Link href={"customers/new"}>Nuevo</Link>
           </Button>
         </div>
       </div>
@@ -33,7 +35,7 @@ function CustomersPage() {
       ) : (
         <div className="mt-4">
           <ul>
-            {data?.map((customer) => (
+            {customers?.map((customer) => (
               <li key={customer.id}>
                 <Link href={`/customers/${customer.id}`}>
                   {customer.name}

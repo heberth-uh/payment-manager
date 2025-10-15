@@ -3,14 +3,17 @@
 import { handleClientError } from "@/lib/utils/client-error";
 import { Customer } from "@prisma/client";
 import { useEffect, useState } from "react";
+import { UseCustomersParmas, UseCustomersReturn } from "./customers.types";
 
-export const useCustomers = () => {
-  const [data, setData] = useState<Customer[]>([]);
+export const useCustomers = (options: UseCustomersParmas = {}): UseCustomersReturn => {
+  const { autoFetch = false, customerId } = options;
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customer, setCustomer] = useState<Customer | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
 
+  // GET ALL
   const getCustomers = async () => {
-    const controller = new AbortController();
     setLoading(true);
     setError(null);
 
@@ -23,31 +26,17 @@ export const useCustomers = () => {
         throw new Error(errorData.message || "Error al obtener clientes");
       }
       const result = await response.json();
-      setData(result.data);
+      setCustomers(result.data);
     } catch (error) {
       setError(handleClientError(error));
     } finally {
       setLoading(false);
     }
-
-    return () => controller.abort();
   };
 
-  useEffect(() => {
-    getCustomers();
-  }, []);
-
-  return { data, loading, error, refetch: getCustomers };
-};
-
-// Get a customer by id
-export const useCustomer = (customerId: string) => {
-  const [customer, setCustomer] = useState<Customer | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  const getCustomer = async () => {
-    const controller = new AbortController();
+  // GET BY ID
+  const getCustomer = async (customerId: string) => {
+    if (!customerId) return;
     setLoading(true);
     setError(null);
 
@@ -64,13 +53,21 @@ export const useCustomer = (customerId: string) => {
     } finally {
       setLoading(false);
     }
-
-    return () => controller.abort();
   };
 
+  // Auto-fetch customers on mount
   useEffect(() => {
-    getCustomer();
+    if (autoFetch) {
+      getCustomers();
+    }
+  }, [autoFetch]);
+
+  // Auto-fetch customer details on mount
+  useEffect(() => {
+    if (customerId) {
+      getCustomer(customerId);
+    }
   }, [customerId]);
 
-  return { customer, loading, error, refetch: getCustomer };
+  return { customers, customer, loading, error, getCustomers, getCustomer };
 };
