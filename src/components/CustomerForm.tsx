@@ -17,9 +17,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
+import { useCustomers } from "@/hooks/api/useCustomers";
+import { toast } from "sonner";
 
 function CustomerForm() {
   const router = useRouter();
+  const { loading, error, createCustomer } = useCustomers();
   const form = useForm<CreateCustomerData>({
     resolver: zodResolver(CreateCustomerSchema),
     defaultValues: {
@@ -30,8 +33,15 @@ function CustomerForm() {
     },
   });
 
-  const onSubmit = () => {
-    // TODO: Call useCreateCustomer
+  const onSubmit = async (data: CreateCustomerData) => {
+    const newCustomer = await createCustomer(data);
+    if (newCustomer) {
+      toast.success("Nuevo cliente agregado")
+      form.reset();
+      router.push(`/customers/${newCustomer.id}`);
+    } else {
+      toast.error(error || "Error al crear el cliente")
+    }
   }
 
   return (

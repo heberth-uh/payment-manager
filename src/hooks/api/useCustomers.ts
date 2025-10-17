@@ -4,8 +4,11 @@ import { handleClientError } from "@/lib/utils/client-error";
 import { Customer } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { UseCustomersParmas, UseCustomersReturn } from "./customers.types";
+import { CreateCustomerData } from "@/lib/validations/customer.schema";
 
-export const useCustomers = (options: UseCustomersParmas = {}): UseCustomersReturn => {
+export const useCustomers = (
+  options: UseCustomersParmas = {}
+): UseCustomersReturn => {
   const { autoFetch = false, customerId } = options;
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [customer, setCustomer] = useState<Customer | null>(null);
@@ -55,6 +58,36 @@ export const useCustomers = (options: UseCustomersParmas = {}): UseCustomersRetu
     }
   };
 
+  // CREATE
+  const createCustomer = async (
+    data: CreateCustomerData
+  ): Promise<Customer | null> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/customers", {
+        method: "POST",
+        headers: { "Content-Type": "aplication/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al obtener cliente");
+      }
+
+      const result = await response.json();
+      const newCustomer: Customer = result.data;
+      return newCustomer;
+    } catch (error) {
+      setError(handleClientError(error));
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Auto-fetch customers on mount
   useEffect(() => {
     if (autoFetch) {
@@ -69,5 +102,13 @@ export const useCustomers = (options: UseCustomersParmas = {}): UseCustomersRetu
     }
   }, [customerId]);
 
-  return { customers, customer, loading, error, getCustomers, getCustomer };
+  return {
+    customers,
+    customer,
+    loading,
+    error,
+    getCustomers,
+    getCustomer,
+    createCustomer,
+  };
 };
