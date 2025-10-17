@@ -3,7 +3,7 @@
 import { PageContainer } from "@/components/PageContainer";
 import React from "react";
 import { useCustomers } from "@/hooks/api/useCustomers";
-import { RefreshCw } from "lucide-react";
+import { Pencil, RefreshCw, Trash } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -34,13 +34,26 @@ function CustomersPage() {
         <p>Cargando...</p>
       ) : (
         <div className="mt-4">
-          <ul>
+          <ul className="flex flex-col gap-2">
             {customers?.map((customer) => (
-              <li key={customer.id}>
+              <li
+                key={customer.id}
+                className="flex justify-between items-center"
+              >
                 <Link href={`/customers/${customer.id}`}>
                   {customer.name}
                   {customer.lastname && ` ${customer.lastname}`}
                 </Link>
+                <div className="flex gap-2">
+                  <Button type="button" variant="secondary" size="sm" title="Eliminar">
+                    <Trash />
+                  </Button>
+                  <Link href={`/customers/edit/${customer.id}`}>
+                  <Button type="button" variant="secondary" size="sm" title="Editar">
+                    <Pencil />
+                  </Button>
+                  </Link>
+                </div>
               </li>
             ))}
           </ul>
