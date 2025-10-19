@@ -23,9 +23,10 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
   const router = useRouter();
   const params = useParams();
   const customerId = Array.isArray(params.id) ? params.id[0] : params.id;
-  const { customer, loading, error, createCustomer } = useCustomers({
-    customerId: isEditing ? customerId : undefined,
-  });
+  const { customer, loading, error, createCustomer, updateCustomer } =
+    useCustomers({
+      customerId: isEditing ? customerId : undefined,
+    });
 
   const form = useForm<CreateCustomerData>({
     resolver: zodResolver(CreateCustomerSchema),
@@ -51,7 +52,13 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
 
   const onSubmit = async (data: CreateCustomerData) => {
     if (isEditing && customerId) {
-      // TODO: Handle updateCustomer
+      const result = await updateCustomer(customerId, data);
+      if (result) {
+        toast.success("Cliente actualizado exitosamente");
+        router.push(`/customers/${customerId}`);
+      } else {
+        toast.error(error || "Error al actualizar el cliente")
+      }
     } else {
       const newCustomer = await createCustomer(data);
       if (newCustomer) {

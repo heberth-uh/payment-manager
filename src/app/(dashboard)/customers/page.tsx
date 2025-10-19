@@ -45,13 +45,23 @@ function CustomersPage() {
                   {customer.lastname && ` ${customer.lastname}`}
                 </Link>
                 <div className="flex gap-2">
-                  <Button type="button" variant="secondary" size="sm" title="Eliminar">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    title="Eliminar"
+                  >
                     <Trash />
                   </Button>
                   <Link href={`/customers/edit/${customer.id}`}>
-                  <Button type="button" variant="secondary" size="sm" title="Editar">
-                    <Pencil />
-                  </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      title="Editar"
+                    >
+                      <Pencil />
+                    </Button>
                   </Link>
                 </div>
               </li>

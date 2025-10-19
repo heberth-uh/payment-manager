@@ -4,7 +4,10 @@ import { handleClientError } from "@/lib/utils/client-error";
 import { Customer } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { UseCustomersParmas, UseCustomersReturn } from "./customers.types";
-import { CreateCustomerData } from "@/lib/validations/customer.schema";
+import {
+  CreateCustomerData,
+  UpdateCustomerData,
+} from "@/lib/validations/customer.schema";
 
 export const useCustomers = (
   options: UseCustomersParmas = {}
@@ -68,7 +71,7 @@ export const useCustomers = (
     try {
       const response = await fetch("/api/customers", {
         method: "POST",
-        headers: { "Content-Type": "aplication/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
@@ -80,6 +83,39 @@ export const useCustomers = (
       const result = await response.json();
       const newCustomer: Customer = result.data;
       return newCustomer;
+    } catch (error) {
+      setError(handleClientError(error));
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // UPDATE
+  const updateCustomer = async (
+    customerId: string,
+    data: UpdateCustomerData
+  ): Promise<Customer | null> => {
+    if (!customerId) return null;
+    setError(null);
+    setLoading(true);
+    console.log('data', data);
+
+    try {
+      const response = await fetch(`/api/customers/${customerId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al actualizar cliente");
+      }
+
+      const result = await response.json();
+      const updatedCustomer: Customer = result.data;
+      return updatedCustomer;
     } catch (error) {
       setError(handleClientError(error));
       return null;
@@ -110,5 +146,6 @@ export const useCustomers = (
     getCustomers,
     getCustomer,
     createCustomer,
+    updateCustomer
   };
 };

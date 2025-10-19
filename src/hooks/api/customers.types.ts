@@ -1,4 +1,4 @@
-import { CreateCustomerData } from "@/lib/validations/customer.schema";
+import { CreateCustomerData, UpdateCustomerData } from "@/lib/validations/customer.schema";
 import { Customer } from "@prisma/client";
 
 export interface UseCustomersParmas {
@@ -14,4 +14,5 @@ export interface UseCustomersReturn {
   getCustomers: () => Promise<void>;
   getCustomer: (customerId: string) => Promise<void>;
   createCustomer: (data: CreateCustomerData) => Promise<Customer | null>;
+  updateCustomer: (customerId: string, data: UpdateCustomerData) => Promise<Customer | null>;
 };

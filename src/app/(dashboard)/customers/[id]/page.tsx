@@ -1,7 +1,9 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useCustomers } from "@/hooks/api/useCustomers";
-import { MapPin, Phone, RefreshCw } from "lucide-react";
+import { MapPin, Pencil, Phone, RefreshCw } from "lucide-react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import React from "react";
 
@@ -25,12 +27,22 @@ function CustomerPage() {
         <h1 className="font-semibold text-lg mb-2">
           {`${customer?.name}${" " + customer?.lastname}`}
         </h1>
-        <button
-          onClick={() => getCustomer(customerId)}
-          className="bg-gray-200 p-2 rounded-md"
-        >
-          <RefreshCw className="size-4" />
-        </button>
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            title="Editar"
+            onClick={() => getCustomer(customerId)}
+          >
+            <RefreshCw className="size-4" />
+          </Button>
+          <Link href={`/customers/edit/${customer?.id}`}>
+            <Button type="button" variant="secondary" size="sm" title="Editar">
+              <Pencil />
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <div className="flex items-center gap-2 mb-2">
