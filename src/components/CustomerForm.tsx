@@ -40,7 +40,7 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
 
   // Reset form with customer data when is fetched
   useEffect(() => {
-    if (isEditing && customer) {
+    if (isEditing && customer && !form.formState.isDirty) {
       form.reset({
         name: customer.name || "",
         lastname: customer.lastname || "",
@@ -48,10 +48,14 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
         address: customer.address || "",
       });
     }
-  }, [isEditing, customer]);
+  }, [isEditing, customer, form]);
 
   const onSubmit = async (data: CreateCustomerData) => {
     if (isEditing && customerId) {
+      if (!form.formState.isDirty) {
+        router.back();
+        return;
+      }
       const result = await updateCustomer(customerId, data);
       if (result) {
         toast.success("Cliente actualizado exitosamente");
