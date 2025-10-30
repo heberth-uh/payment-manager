@@ -6,6 +6,7 @@ import { useCustomers } from "@/hooks/api/useCustomers";
 import { Pencil, RefreshCw, Trash } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import ConfirmaDialog from "@/components/ui/ConfirmaDialog";
 
 function CustomersPage() {
   const { customers, loading, error, getCustomers } = useCustomers({
@@ -45,14 +46,18 @@ function CustomersPage() {
                   {customer.lastname && ` ${customer.lastname}`}
                 </Link>
                 <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    title="Eliminar"
-                  >
-                    <Trash />
-                  </Button>
+                  <ConfirmaDialog
+                    title="Eliminar cliente"
+                    description={`¿Estás seguro de eliminar a ${customer.name}? Esta acción no se puede deshacer.`}>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      title="Eliminar"
+                    >
+                      <Trash />
+                    </Button>
+                  </ConfirmaDialog>
                   <Link href={`/customers/edit/${customer.id}`}>
                     <Button
                       type="button"

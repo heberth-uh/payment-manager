@@ -53,8 +53,7 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
   const onSubmit = async (data: CreateCustomerData) => {
     if (isEditing && customerId) {
       if (!form.formState.isDirty) {
-        router.back();
-        return;
+        router.push(`/customers/${customerId}`);
       }
       const result = await updateCustomer(customerId, data);
       if (result) {
