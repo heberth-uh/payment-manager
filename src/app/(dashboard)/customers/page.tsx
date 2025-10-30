@@ -7,15 +7,26 @@ import { Pencil, RefreshCw, Trash } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import ConfirmaDialog from "@/components/ui/ConfirmaDialog";
+import { toast } from "sonner";
 
 function CustomersPage() {
-  const { customers, loading, error, getCustomers } = useCustomers({
-    autoFetch: true,
-  });
+  const { customers, loading, error, getCustomers, deleteCustomer } =
+    useCustomers({
+      autoFetch: true,
+    });
 
   if (error) {
     return <PageContainer>Error {error}</PageContainer>;
   }
+
+  const handleDeleteCustomer = async (id: string) => {
+    const success = await deleteCustomer(id);
+    if (success) {
+      toast.success("Se ha eliminado un cliente");
+    } else {
+      toast.error("No se pudo eliminar el cliente");
+    }
+  };
 
   return (
     <PageContainer>
@@ -31,7 +42,11 @@ function CustomersPage() {
         </div>
       </div>
 
-      {loading ? (
+      {/* TODO: This loading state should be improved, 
+      it's fine for fetching 'cause data is not yet
+      but for deleting, we already have data so we don't need to show a loading state
+      since the customer list is updated in the hook */}
+      {loading ? ( 
         <p>Cargando...</p>
       ) : (
         <div className="mt-4">
@@ -48,7 +63,9 @@ function CustomersPage() {
                 <div className="flex gap-2">
                   <ConfirmaDialog
                     title="Eliminar cliente"
-                    description={`¿Estás seguro de eliminar a ${customer.name}? Esta acción no se puede deshacer.`}>
+                    description={`¿Estás seguro de eliminar a ${customer.name}? Esta acción no se puede deshacer.`}
+                    actionConfirm={() => handleDeleteCustomer(customer.id)}
+                  >
                     <Button
                       type="button"
                       variant="secondary"

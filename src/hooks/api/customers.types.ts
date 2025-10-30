@@ -15,4 +15,5 @@ export interface UseCustomersReturn {
   getCustomer: (customerId: string) => Promise<void>;
   createCustomer: (data: CreateCustomerData) => Promise<Customer | null>;
   updateCustomer: (customerId: string, data: UpdateCustomerData) => Promise<Customer | null>;
+  deleteCustomer: (custoemrId: string) => Promise<Boolean>;
 };

@@ -99,7 +99,6 @@ export const useCustomers = (
     if (!customerId) return null;
     setError(null);
     setLoading(true);
-    console.log('data', data);
 
     try {
       const response = await fetch(`/api/customers/${customerId}`, {
@@ -119,6 +118,35 @@ export const useCustomers = (
     } catch (error) {
       setError(handleClientError(error));
       return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // DELETE
+  const deleteCustomer = async (customerId: string): Promise<boolean> => {
+    setError(null);
+    setLoading(true);
+
+    try {
+      const response = await fetch(`/api/customers/${customerId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al eliminar cliente");
+      }
+
+      // Delete from customers state
+      setCustomers(customers.filter((c) => c.id !== customerId));
+      // Delete from customer state
+      if (customer?.id === customerId) setCustomer(null);
+
+      return true;
+    } catch (error) {
+      handleClientError(error);
+      return false;
     } finally {
       setLoading(false);
     }
@@ -146,6 +174,7 @@ export const useCustomers = (
     getCustomers,
     getCustomer,
     createCustomer,
-    updateCustomer
+    updateCustomer,
+    deleteCustomer,
   };
 };
