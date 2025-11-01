@@ -15,7 +15,7 @@ function CustomerPage() {
   const customerId = Array.isArray(params.id) ? params.id[0] : params.id;
 
   if (!customerId) return <p>El ID del cliente es inválido</p>;
-  const { customer, loading, error, getCustomer, deleteCustomer } =
+  const { customer, isFetching, error, getCustomer, deleteCustomer } =
     useCustomers({
       autoFetch: true,
       customerId,
@@ -33,8 +33,8 @@ function CustomerPage() {
     }
   };
 
-  return loading ? (
-    <p>Loading</p>
+  return isFetching ? (
+    <p>Cargando...</p>
   ) : (
     <div>
       <div className="flex justify-between items-center">

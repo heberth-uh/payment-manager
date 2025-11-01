@@ -9,7 +9,8 @@ export interface UseCustomersParmas {
 export interface UseCustomersReturn {
   customers: Customer[];
   customer: Customer | null;
-  loading: boolean;
+  isFetching: boolean;
+  isSubmitting: boolean;
   error: string | null;
   getCustomers: () => Promise<void>;
   getCustomer: (customerId: string) => Promise<void>;

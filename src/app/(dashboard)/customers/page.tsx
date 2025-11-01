@@ -1,7 +1,7 @@
 "use client";
 
 import { PageContainer } from "@/components/PageContainer";
-import React from "react";
+import React, { useState } from "react";
 import { useCustomers } from "@/hooks/api/useCustomers";
 import { Pencil, RefreshCw, Trash } from "lucide-react";
 import Link from "next/link";
@@ -10,21 +10,30 @@ import ConfirmaDialog from "@/components/ui/ConfirmaDialog";
 import { toast } from "sonner";
 
 function CustomersPage() {
-  const { customers, loading, error, getCustomers, deleteCustomer } =
-    useCustomers({
-      autoFetch: true,
-    });
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const {
+    customers,
+    isFetching,
+    isSubmitting,
+    error,
+    getCustomers,
+    deleteCustomer,
+  } = useCustomers({
+    autoFetch: true,
+  });
 
   if (error) {
     return <PageContainer>Error {error}</PageContainer>;
   }
 
   const handleDeleteCustomer = async (id: string) => {
+    setDeletingId(id);
     const success = await deleteCustomer(id);
+    setDeletingId(null);
     if (success) {
       toast.success("Se ha eliminado un cliente");
     } else {
-      toast.error("No se pudo eliminar el cliente");
+      toast.error(error || "No se pudo eliminar el cliente");
     }
   };
 
@@ -33,21 +42,28 @@ function CustomersPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl">Clientes</h1>
         <div className="flex items-center gap-2">
-          <Button onClick={() => getCustomers()} variant={"secondary"}>
-            <RefreshCw className="size-4" />
+          <Button
+            onClick={() => getCustomers()}
+            variant="secondary"
+            disabled={isFetching}
+          >
+            <RefreshCw className={`size-4 ${isFetching && "animate-spin"}`} />
           </Button>
           <Button>
-            <Link href={"customers/new"}>Nuevo</Link>
+            <Link href="customers/new">Nuevo</Link>
           </Button>
         </div>
       </div>
 
-      {/* TODO: This loading state should be improved, 
-      it's fine for fetching 'cause data is not yet
-      but for deleting, we already have data so we don't need to show a loading state
-      since the customer list is updated in the hook */}
-      {loading ? ( 
+      {isFetching && customers.length === 0 ? (
         <p>Cargando...</p>
+      ) : customers.length === 0 ? (
+        <div className="text-center p-12">
+          <p className="text-gray-500">No hay clientes todavía</p>
+          <Button asChild className="mt-4">
+            <Link href="customers/new">Crear primer cliente</Link>
+          </Button>
+        </div>
       ) : (
         <div className="mt-4">
           <ul className="flex flex-col gap-2">
@@ -60,32 +76,41 @@ function CustomersPage() {
                   {customer.name}
                   {customer.lastname && ` ${customer.lastname}`}
                 </Link>
-                <div className="flex gap-2">
-                  <ConfirmaDialog
-                    title="Eliminar cliente"
-                    description={`¿Estás seguro de eliminar a ${customer.name}? Esta acción no se puede deshacer.`}
-                    actionConfirm={() => handleDeleteCustomer(customer.id)}
-                  >
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      title="Eliminar"
+                {deletingId === customer.id ? (
+                  <div className="flex items-center gap-2">
+                    <span className="italic text-gray-600">Eliminando</span>
+                    <div className="size-3 rounded-full border-2 border-gray-600 border-t-transparent animate-spin [animation-duration:0.4s]"></div>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <ConfirmaDialog
+                      title="Eliminar cliente"
+                      description={`¿Estás seguro de eliminar a ${customer.name}? Esta acción no se puede deshacer.`}
+                      actionConfirm={() => handleDeleteCustomer(customer.id)}
                     >
-                      <Trash />
-                    </Button>
-                  </ConfirmaDialog>
-                  <Link href={`/customers/edit/${customer.id}`}>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      title="Editar"
-                    >
-                      <Pencil />
-                    </Button>
-                  </Link>
-                </div>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        title="Eliminar"
+                        disabled={isSubmitting}
+                      >
+                        <Trash />
+                      </Button>
+                    </ConfirmaDialog>
+                    <Link href={`/customers/edit/${customer.id}`}>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        title="Editar"
+                        disabled={isSubmitting}
+                      >
+                        <Pencil />
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </li>
             ))}
           </ul>

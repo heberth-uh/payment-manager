@@ -16,11 +16,12 @@ export const useCustomers = (
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isFetching, setIsFetching] = useState<boolean>(autoFetch);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // GET ALL
   const getCustomers = async () => {
-    setLoading(true);
+    setIsFetching(true);
     setError(null);
 
     try {
@@ -36,14 +37,14 @@ export const useCustomers = (
     } catch (error) {
       setError(handleClientError(error));
     } finally {
-      setLoading(false);
+      setIsFetching(false);
     }
   };
 
   // GET BY ID
   const getCustomer = async (customerId: string) => {
     if (!customerId) return;
-    setLoading(true);
+    setIsFetching(true);
     setError(null);
 
     try {
@@ -57,7 +58,7 @@ export const useCustomers = (
     } catch (error) {
       setError(handleClientError(error));
     } finally {
-      setLoading(false);
+      setIsFetching(false);
     }
   };
 
@@ -65,7 +66,7 @@ export const useCustomers = (
   const createCustomer = async (
     data: CreateCustomerData
   ): Promise<Customer | null> => {
-    setLoading(true);
+    setIsSubmitting(true);
     setError(null);
 
     try {
@@ -87,7 +88,7 @@ export const useCustomers = (
       setError(handleClientError(error));
       return null;
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -98,7 +99,7 @@ export const useCustomers = (
   ): Promise<Customer | null> => {
     if (!customerId) return null;
     setError(null);
-    setLoading(true);
+    setIsSubmitting(true);
 
     try {
       const response = await fetch(`/api/customers/${customerId}`, {
@@ -119,14 +120,14 @@ export const useCustomers = (
       setError(handleClientError(error));
       return null;
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   // DELETE
   const deleteCustomer = async (customerId: string): Promise<boolean> => {
     setError(null);
-    setLoading(true);
+    setIsSubmitting(true);
 
     try {
       const response = await fetch(`/api/customers/${customerId}`, {
@@ -148,7 +149,7 @@ export const useCustomers = (
       handleClientError(error);
       return false;
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -169,7 +170,8 @@ export const useCustomers = (
   return {
     customers,
     customer,
-    loading,
+    isFetching,
+    isSubmitting,
     error,
     getCustomers,
     getCustomer,
