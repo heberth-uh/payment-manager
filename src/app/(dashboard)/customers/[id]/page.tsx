@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import ConfirmaDialog from "@/components/ui/ConfirmaDialog";
+import { Label } from "@/components/ui/label";
 import { useCustomers } from "@/hooks/api/useCustomers";
 import { MapPin, Pencil, Phone, RefreshCw, Trash } from "lucide-react";
 import Link from "next/link";
@@ -38,19 +39,13 @@ function CustomerPage() {
   ) : (
     <div>
       <div className="flex justify-between items-center">
-        <h1 className="font-semibold text-lg mb-2">
-          {`${customer?.name}${" " + customer?.lastname}`}
-        </h1>
+        <div>
+          <Label>Nombre</Label>
+          <h1 className="font-semibold text-lg mb-2">
+            {`${customer?.name}${" " + customer?.lastname}`}
+          </h1>
+        </div>
         <div className="flex gap-2">
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            title="Editar"
-            onClick={() => getCustomer(customerId)}
-          >
-            <RefreshCw className="size-4" />
-          </Button>
           <ConfirmaDialog
             title="Eliminar cliente"
             description={`¿Estás seguro de eliminar a ${customer?.name}? Esta acción no se puede deshacer.`}
@@ -74,12 +69,12 @@ function CustomerPage() {
       </div>
 
       <div className="flex items-center gap-2 mb-2">
-        <Phone />
-        <p>{customer?.phone}</p>
+        <Phone className="size-4" />
+        <p>{customer?.phone || "Sin teléfono"}</p>
       </div>
       <div className="flex items-center gap-2">
-        <MapPin />
-        <p>{customer?.address}</p>
+        <MapPin className="size-4" />
+        <p>{customer?.address || "Sin dirección"}</p>
       </div>
     </div>
   );

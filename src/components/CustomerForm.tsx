@@ -13,7 +13,6 @@ import { Button } from "./ui/button";
 import { useParams, useRouter } from "next/navigation";
 import { useCustomers } from "@/hooks/api/useCustomers";
 import { toast } from "sonner";
-import { Customer } from "@prisma/client";
 
 interface CustomerFormProps {
   isEditing?: boolean;
@@ -23,7 +22,7 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
   const router = useRouter();
   const params = useParams();
   const customerId = Array.isArray(params.id) ? params.id[0] : params.id;
-  const { customer, loading, error, createCustomer, updateCustomer } =
+  const { customer, isFetching, error, createCustomer, updateCustomer } =
     useCustomers({
       customerId: isEditing ? customerId : undefined,
     });
@@ -60,7 +59,7 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
         toast.success("Cliente actualizado exitosamente");
         router.push(`/customers/${customerId}`);
       } else {
-        toast.error(error || "Error al actualizar el cliente")
+        toast.error(error || "Error al actualizar el cliente");
       }
     } else {
       const newCustomer = await createCustomer(data);
@@ -88,7 +87,11 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Nombre*" {...field} />
+                    <Input
+                      placeholder="Nombre*"
+                      {...field}
+                      disabled={isFetching}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -102,7 +105,11 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Apellido" {...field} />
+                    <Input
+                      placeholder="Apellido"
+                      {...field}
+                      disabled={isFetching}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -116,7 +123,11 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Teléfono" {...field} />
+                    <Input
+                      placeholder="Teléfono"
+                      {...field}
+                      disabled={isFetching}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -130,7 +141,11 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Dirección" {...field} />
+                    <Input
+                      placeholder="Dirección"
+                      {...field}
+                      disabled={isFetching}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -143,10 +158,15 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
               onClick={() => router.back()}
               className="flex-1"
               variant="secondary"
+              disabled={isFetching || form.formState.isSubmitting}
             >
               Cancelar
             </Button>
-            <Button type="submit" className="flex-1">
+            <Button
+              type="submit"
+              className="flex-1"
+              disabled={isFetching || form.formState.isSubmitting}
+            >
               Guardar
             </Button>
           </div>
