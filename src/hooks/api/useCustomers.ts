@@ -83,6 +83,8 @@ export const useCustomers = (
 
       const result = await response.json();
       const newCustomer: Customer = result.data;
+      setCustomer(newCustomer);
+      setCustomers((prev) => [...prev, newCustomer]);
       return newCustomer;
     } catch (error) {
       setError(handleClientError(error));
@@ -115,6 +117,8 @@ export const useCustomers = (
 
       const result = await response.json();
       const updatedCustomer: Customer = result.data;
+      setCustomer(updatedCustomer);
+      setCustomers((prev) => prev.map((c) => (c.id === customerId ? updatedCustomer : c)));
       return updatedCustomer;
     } catch (error) {
       setError(handleClientError(error));
@@ -139,14 +143,13 @@ export const useCustomers = (
         throw new Error(errorData.message || "Error al eliminar cliente");
       }
 
-      // Delete from customers state
-      setCustomers(customers.filter((c) => c.id !== customerId));
+      setCustomers((prev) => prev.filter((c) => c.id !== customerId));
       // Delete from customer state
       if (customer?.id === customerId) setCustomer(null);
 
       return true;
     } catch (error) {
-      handleClientError(error);
+      setError(handleClientError(error));
       return false;
     } finally {
       setIsSubmitting(false);
