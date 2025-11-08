@@ -1,17 +1,17 @@
 "use client";
 
-import { PageContainer } from "@/components/PageContainer";
 import React, { useState } from "react";
-import { useCustomers } from "@/hooks/api/useCustomers";
-import { Pencil, RefreshCw, Trash } from "lucide-react";
 import Link from "next/link";
+import { PageContainer } from "@/components/PageContainer";
 import { Button } from "@/components/ui/button";
 import ConfirmaDialog from "@/components/ui/ConfirmaDialog";
 import { toast } from "sonner";
+import { useCustomers } from "@/contexts/customer/CustomerContext";
+import { Pencil, RefreshCw, Trash } from "lucide-react";
 
 function CustomersPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const {
+  /*   const {
     customers,
     isFetching,
     isSubmitting,
@@ -21,6 +21,15 @@ function CustomersPage() {
   } = useCustomers({
     autoFetch: true,
   });
+ */
+  const {
+    customers,
+    isFetching,
+    isSubmitting,
+    error,
+    getCustomers,
+    deleteCustomer,
+  } = useCustomers();
 
   if (error) {
     return <PageContainer>Error {error}</PageContainer>;

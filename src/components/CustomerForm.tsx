@@ -11,8 +11,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useParams, useRouter } from "next/navigation";
-import { useCustomers } from "@/hooks/api/useCustomers";
 import { toast } from "sonner";
+import { useCustomers } from "@/contexts/customer/CustomerContext";
 
 interface CustomerFormProps {
   isEditing?: boolean;
@@ -22,10 +22,14 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
   const router = useRouter();
   const params = useParams();
   const customerId = Array.isArray(params.id) ? params.id[0] : params.id;
-  const { customer, isFetching, error, createCustomer, updateCustomer } =
-    useCustomers({
-      customerId: isEditing ? customerId : undefined,
-    });
+  const {
+    customer,
+    isFetching,
+    error,
+    getCustomer,
+    createCustomer,
+    updateCustomer,
+  } = useCustomers();
 
   const form = useForm<CreateCustomerData>({
     resolver: zodResolver(CreateCustomerSchema),
@@ -37,14 +41,21 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
     },
   });
 
+  // Fetch customer data when in editing mode
+  useEffect(() => {
+    if (isEditing && customerId) {
+      getCustomer(customerId);
+    }
+  }, [isEditing, customerId]);
+
   // Reset form with customer data when is fetched
   useEffect(() => {
-    if (isEditing && customer && !form.formState.isDirty) {
+    if (isEditing && customer?.id === customerId && !form.formState.isDirty) {
       form.reset({
-        name: customer.name || "",
-        lastname: customer.lastname || "",
-        phone: customer.phone || "",
-        address: customer.address || "",
+        name: customer?.name || "",
+        lastname: customer?.lastname || "",
+        phone: customer?.phone || "",
+        address: customer?.address || "",
       });
     }
   }, [isEditing, customer, form]);
@@ -90,7 +101,7 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
                     <Input
                       placeholder="Nombre*"
                       {...field}
-                      disabled={isFetching}
+                      disabled={isFetching || form.formState.isSubmitting}
                     />
                   </FormControl>
                   <FormMessage />
@@ -108,7 +119,7 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
                     <Input
                       placeholder="Apellido"
                       {...field}
-                      disabled={isFetching}
+                      disabled={isFetching || form.formState.isSubmitting}
                     />
                   </FormControl>
                   <FormMessage />
@@ -126,7 +137,7 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
                     <Input
                       placeholder="Teléfono"
                       {...field}
-                      disabled={isFetching}
+                      disabled={isFetching || form.formState.isSubmitting}
                     />
                   </FormControl>
                   <FormMessage />
@@ -144,7 +155,7 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
                     <Input
                       placeholder="Dirección"
                       {...field}
-                      disabled={isFetching}
+                      disabled={isFetching || form.formState.isSubmitting}
                     />
                   </FormControl>
                   <FormMessage />

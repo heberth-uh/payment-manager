@@ -1,13 +1,13 @@
 "use client";
 
+import React, { useEffect } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import ConfirmaDialog from "@/components/ui/ConfirmaDialog";
 import { Label } from "@/components/ui/label";
-import { useCustomers } from "@/hooks/api/useCustomers";
-import { MapPin, Pencil, Phone, RefreshCw, Trash } from "lucide-react";
-import Link from "next/link";
+import { useCustomers } from "@/contexts/customer/CustomerContext";
+import { MapPin, Pencil, Phone, Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import React from "react";
 import { toast } from "sonner";
 
 function CustomerPage() {
@@ -16,13 +16,15 @@ function CustomerPage() {
   const customerId = Array.isArray(params.id) ? params.id[0] : params.id;
 
   if (!customerId) return <p>El ID del cliente es inválido</p>;
+
   const { customer, isFetching, error, getCustomer, deleteCustomer } =
-    useCustomers({
-      autoFetch: true,
-      customerId,
-    });
+    useCustomers();
 
   if (error) return <p>{error}</p>;
+
+  useEffect(() => {
+    getCustomer(customerId); // TODO: Check why it seems like it called twice
+  }, [customerId]);
 
   const handleDeleteCustomer = async (id: string) => {
     const success = await deleteCustomer(id);
