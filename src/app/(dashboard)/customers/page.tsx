@@ -11,17 +11,6 @@ import { Pencil, RefreshCw, Trash } from "lucide-react";
 
 function CustomersPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  /*   const {
-    customers,
-    isFetching,
-    isSubmitting,
-    error,
-    getCustomers,
-    deleteCustomer,
-  } = useCustomers({
-    autoFetch: true,
-  });
- */
   const {
     customers,
     isFetching,

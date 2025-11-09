@@ -19,6 +19,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   customers     Customer[]
+  sales         Sale[]
 
   @@unique([email])
   @@map("user")
@@ -82,6 +83,38 @@ model Customer {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  sales Sale[]
+
   @@index([userId])
   @@map("customer")
+}
+
+// ---------- Sales ----------
+
+model Sale {
+  id              String     @id @default(cuid())
+  status          SaleStatus @default(PENDING)
+  lastSaleDate    DateTime   @default(now())
+  lastPaymentDate DateTime?
+  notes           String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  // User relation
+  userId          String
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Customer relation
+  customerId      String
+  customer        Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("sale")
+}
+
+// ---------------------------
+// Enums
+// ---------------------------
+
+enum SaleStatus {
+  PENDING
+  PAID
+  CANCELED
 }
