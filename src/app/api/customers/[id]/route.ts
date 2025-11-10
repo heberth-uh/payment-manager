@@ -5,10 +5,7 @@ import { UpdateCustomerSchema } from "@/lib/validations/customer.schema";
 import { NextRequest, NextResponse } from "next/server";
 
 // Get a customer
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET({ params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const session = await getServerSession();
@@ -18,7 +15,7 @@ export async function GET(
     }
 
     const result = await prisma.customer.findUnique({
-      where: { id },
+      where: { id, userId: session.user.id },
     });
 
     if (!result) {
@@ -55,7 +52,7 @@ export async function PUT(
     const data = UpdateCustomerSchema.parse(body);
 
     const result = await prisma.customer.update({
-      where: { id },
+      where: { id, userId: session.user.id },
       data,
     });
 
@@ -69,10 +66,7 @@ export async function PUT(
 }
 
 // Delete a customer
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE({ params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const session = await getServerSession();
@@ -82,7 +76,7 @@ export async function DELETE(
     }
 
     const result = await prisma.customer.delete({
-      where: { id },
+      where: { id, userId: session.user.id },
     });
     return NextResponse.json({
       message: "Customer deleted successfully",

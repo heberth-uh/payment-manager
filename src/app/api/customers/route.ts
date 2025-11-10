@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
               { name: { contains: search, mode: "insensitive" } },
               { lastname: { contains: search, mode: "insensitive" } },
             ],
+            userId: session.user.id,
           }
         : undefined,
     });
