@@ -1,0 +1,60 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { handleApiError } from "@/lib/utils/api-error";
+import { getServerSession } from "@/lib/get-session";
+
+// Get all sales
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get("search");
+
+    const session = await getServerSession();
+    if (!session?.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+    const sales = await prisma.sale.findMany({
+      where: search
+        ? {
+            customer: {
+              OR: [
+                { name: { contains: search, mode: "insensitive" } },
+                { lastname: { contains: search, mode: "insensitive" } },
+              ],
+            },
+            userId: session.user.id,
+          }
+        : undefined,
+      include: { customer: true },
+      orderBy: {
+        lastSaleDate: "desc",
+      },
+    });
+    return NextResponse.json({ data: sales }, { status: 200 });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Create a new sale
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const session = await getServerSession();
+
+    // TODO: Validate body here
+
+    if (!session?.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+    const result = await prisma.sale.create({
+      data: body, // TODO: customerId comes in the body and take userId from current session
+    });
+    return NextResponse.json(
+      { meessage: "Sale created successfully", data: result },
+      { status: 201 }
+    );
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
