@@ -5,7 +5,10 @@ import { UpdateCustomerSchema } from "@/lib/validations/customer.schema";
 import { NextRequest, NextResponse } from "next/server";
 
 // Get a customer
-export async function GET({ params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id } = await params;
     const session = await getServerSession();
@@ -66,7 +69,10 @@ export async function PUT(
 }
 
 // Delete a customer
-export async function DELETE({ params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id } = await params;
     const session = await getServerSession();
