@@ -1,9 +1,18 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { Sale } from "@prisma/client";
+import { handleClientError } from "@/lib/utils/client-error";
+import { salesApi } from "@/lib/api/sales";
 
-interface SaleContextType {}
+interface SaleContextType {
+  sales: Sale[];
+  sale: Sale | null;
+  isFetching: boolean;
+  isSubmitting: boolean;
+  error: string | null;
+  getSales: () => Promise<void>;
+}
 
 const SaleContext = createContext<SaleContextType | null>(null);
 
@@ -15,14 +24,40 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   // GET ALL
+  const getSales = async () => {
+    setError(null);
+    setIsFetching(true);
+
+    try {
+      const data = await salesApi.getAll();
+      setSales(data);
+    } catch (error) {
+      setError(handleClientError(error));
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
   // GET BY ID
   // CREATE
   // UPDATE
   // DELETE
 
+  // Auto fetch sales on mount
+  useEffect(() => {
+    getSales();
+  }, []);
+
   return (
     <SaleContext.Provider
-      value={{ sales, sale, isFetching, isSubmitting, error }}
+      value={{
+        sales,
+        sale,
+        isFetching,
+        isSubmitting,
+        error,
+        getSales,
+      }}
     >
       {children}
     </SaleContext.Provider>
@@ -34,4 +69,5 @@ export const useSales = () => {
   if (!context) {
     throw new Error("useSale must be used within a SaleProvider");
   }
+  return context;
 };
