@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
 import { getServerSession } from "@/lib/get-session";
+import { CreateSaleSchema } from "@/lib/validations/sale.schema";
 
 // Get all sales
 export async function GET(request: NextRequest) {
@@ -42,13 +43,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const session = await getServerSession();
 
-    // TODO: Validate body here
-
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
+
+    // Validate the request body
+    const data = CreateSaleSchema.parse(body);
     const result = await prisma.sale.create({
-      data: body, // TODO: customerId comes in the body and take userId from current session
+      data: {
+        ...data,
+        userId: session.user.id,
+      },
     });
     return NextResponse.json(
       { meessage: "Sale created successfully", data: result },

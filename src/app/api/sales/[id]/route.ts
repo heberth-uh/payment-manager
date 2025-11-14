@@ -1,6 +1,7 @@
 import { getServerSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
+import { UpdateSaleSchema } from "@/lib/validations/sale.schema";
 import { NextRequest, NextResponse } from "next/server";
 
 // Get a sale
@@ -49,11 +50,11 @@ export async function PUT(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    // TODO: Valitate body
-
+    // Valitate the requeste body
+    const data = UpdateSaleSchema.parse(body);
     const result = await prisma.sale.update({
       where: { id, userId: session.user.id },
-      data: body,
+      data,
     });
 
     return NextResponse.json({
