@@ -47,7 +47,7 @@ function SalesPage() {
             {sales?.map((sale) => (
               <li key={sale.id}>
                 <Link
-                  href={`/sale/${sale.id}`}
+                  href={`/sales/${sale.id}`}
                   className="flex justify-between items-center"
                 >
                   <p>{sale.customer.name}</p>
