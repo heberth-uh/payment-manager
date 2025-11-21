@@ -1,24 +1,15 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { Sale } from "@prisma/client";
 import { handleClientError } from "@/lib/utils/client-error";
 import { salesApi } from "@/lib/api/sales";
-
-interface SaleContextType {
-  sales: Sale[];
-  sale: Sale | null;
-  isFetching: boolean;
-  isSubmitting: boolean;
-  error: string | null;
-  getSales: () => Promise<void>;
-}
+import { SaleContextType, SaleWithRelations } from "./sale.types";
 
 const SaleContext = createContext<SaleContextType | null>(null);
 
 export function SaleProvider({ children }: { children: React.ReactNode }) {
-  const [sales, setSales] = useState<Sale[]>([]);
-  const [sale, setSale] = useState<Sale | null>(null);
+  const [sales, setSales] = useState<SaleWithRelations[]>([]);
+  const [sale, setSale] = useState<SaleWithRelations | null>(null);
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

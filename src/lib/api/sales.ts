@@ -1,8 +1,8 @@
-import { Sale } from "@prisma/client";
+import { SaleWithRelations } from "@/contexts/sale/sale.types";
 
 export const salesApi = {
   // GET ALL
-  async getAll(): Promise<Sale[]> {
+  async getAll(): Promise<SaleWithRelations[]> {
     const response = await fetch("api/sales");
     if (!response.ok) {
       const errorData = await response.json();
