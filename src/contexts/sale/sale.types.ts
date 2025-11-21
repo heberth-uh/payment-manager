@@ -11,4 +11,5 @@ export interface SaleContextType {
   isSubmitting: boolean;
   error: string | null;
   getSales: () => Promise<void>;
+  getSale: (saleId: string, forceRefresh?: boolean) => Promise<void>;
 }

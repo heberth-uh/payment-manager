@@ -11,4 +11,14 @@ export const salesApi = {
     const result = await response.json();
     return result.data;
   },
+
+  async getById(saleId: string): Promise<SaleWithRelations> {
+    const response = await fetch(`/api/sales/${saleId}`);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Error al obtener venta");
+    }
+    const result = await response.json();
+    return result.data;
+  },
 };

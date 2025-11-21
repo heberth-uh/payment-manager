@@ -30,6 +30,23 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
   };
 
   // GET BY ID
+  const getSale = async (saleId: string, forceRefresh?: boolean) => {
+    if (!saleId) return;
+
+    if (!forceRefresh && sale?.id === saleId) return;
+    setError(null);
+    setIsFetching(true);
+
+    try {
+      const data = await salesApi.getById(saleId);
+      setSale(data);
+    } catch (error) {
+      setError(handleClientError(error));
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
   // CREATE
   // UPDATE
   // DELETE
@@ -48,6 +65,7 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
         isSubmitting,
         error,
         getSales,
+        getSale,
       }}
     >
       {children}
