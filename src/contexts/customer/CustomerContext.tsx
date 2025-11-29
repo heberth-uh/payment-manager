@@ -6,7 +6,7 @@ import {
   CreateCustomerData,
   UpdateCustomerData,
 } from "@/lib/validations/customer.schema";
-import { Customer } from "@prisma/client";
+import { Customer } from "@/generated/prisma/client";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { CustomerContextType } from "./customer.types";
 

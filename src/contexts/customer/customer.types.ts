@@ -2,7 +2,7 @@ import {
   CreateCustomerData,
   UpdateCustomerData,
 } from "@/lib/validations/customer.schema";
-import { Customer } from "@prisma/client";
+import { Customer } from "@/generated/prisma/client";
 
 export interface CustomerContextType {
   customers: Customer[];
