@@ -10,7 +10,7 @@ export interface CustomerContextType {
   isFetching: boolean;
   isSubmitting: boolean;
   error: string | null;
-  getCustomers: () => Promise<void>;
+  getCustomers: (search?: string) => Promise<void>;
   getCustomer: (customerId: string, forceRefresh?: boolean) => Promise<void>;
   createCustomer: (data: CreateCustomerData) => Promise<Customer | null>;
   updateCustomer: (

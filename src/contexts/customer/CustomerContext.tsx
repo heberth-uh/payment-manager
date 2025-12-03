@@ -20,12 +20,12 @@ export function CustomerProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   // GET ALL
-  const getCustomers = async () => {
+  const getCustomers = async (search?: string) => {
     setError(null);
     setIsFetching(true);
 
     try {
-      const data = await customersApi.getAll();
+      const data = await customersApi.getAll(search);
       setCustomers(data);
     } catch (error) {
       setError(handleClientError(error));

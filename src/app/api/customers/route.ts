@@ -9,7 +9,13 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search");
+    const limit = searchParams.get("limit");
     const session = await getServerSession();
+
+    let limitParsed = limit ? parseInt(limit) : undefined;
+    if (isNaN(limitParsed!)) {
+      limitParsed = undefined;
+    }
 
     if (!session?.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -25,6 +31,7 @@ export async function GET(request: NextRequest) {
             userId: session.user.id,
           }
         : undefined,
+      take: limitParsed,
     });
 
     return NextResponse.json({ data: customers }, { status: 200 });

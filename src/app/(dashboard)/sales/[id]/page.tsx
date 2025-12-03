@@ -1,18 +1,13 @@
 "use client";
 
 import React, { useEffect } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Database, MapPin, Pencil, Phone } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { useSales } from "@/contexts/sale/SaleContext";
 import { PageContainer } from "@/components/PageContainer";
 
 function SalePage() {
   const params = useParams();
-  const router = useRouter();
   const saleId = Array.isArray(params.id) ? params.id[0] : params.id;
 
   if (!saleId) return <p>El ID de la venta es inválido</p>;
@@ -52,7 +47,7 @@ function SalePage() {
       </div>
       <div>
         <Label>Notas</Label>
-        <p className="italic color-gray-500">{sale?.notes || "No hay notas"}</p>
+        <p className="italic text-gray-500">{sale?.notes || "No hay notas"}</p>
       </div>
     </PageContainer>
   );

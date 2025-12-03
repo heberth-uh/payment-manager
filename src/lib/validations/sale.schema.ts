@@ -2,14 +2,14 @@ import { z } from "zod";
 
 export const CreateSaleSchema = z.object({
   status: z.enum(["PENDING", "PAID", "CANCELED"]).default("PENDING").optional(),
-  lastSaleDate: z.coerce.date().optional(),
-  lastPaymentDate: z.coerce.date().nullable().optional(),
+  lastSaleDate: z.date().optional(),
+  lastPaymentDate: z.date().optional(),
   notes: z
     .string("")
     .max(500, "Las notas no pueden exceder 500 caracteres")
     .trim()
     .optional(),
-  customerId: z.string("El cliente es requerido"),
+  customerId: z.string().min(1, "El cliente es requerido"),
 });
 
 export const UpdateSaleSchema = CreateSaleSchema.partial();

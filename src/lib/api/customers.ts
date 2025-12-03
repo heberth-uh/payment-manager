@@ -6,8 +6,11 @@ import {
 
 export const customersApi = {
   // GET ALL
-  async getAll(): Promise<Customer[]> {
-    const response = await fetch("/api/customers");
+  async getAll(search?: string, limit?: number): Promise<Customer[]> {
+    const url = search
+      ? `/api/customers?search=${encodeURIComponent(search)}&limit=${limit}`
+      : `/api/customers?limit=${limit}`;
+    const response = await fetch(url);
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Error al obtener clientes");
