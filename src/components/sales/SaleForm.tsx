@@ -19,8 +19,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import CustomerCombobox from "../CustomerCombobox";
+import { useSales } from "@/contexts/sale/SaleContext";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 function SaleForm() {
+  const router = useRouter();
+  const { isFetching, error, createSale } = useSales();
   const form = useForm<CreateSaleData>({
     resolver: zodResolver(CreateSaleSchema),
     defaultValues: {
@@ -29,8 +34,15 @@ function SaleForm() {
     },
   });
 
-  const onsubmit = (data: CreateSaleData) => {
-    console.log("submitting test...", data);
+  const onsubmit = async (data: CreateSaleData) => {
+    const newSale = await createSale(data);
+    if (newSale) {
+      toast.success("Nueva venta creada");
+      form.reset();
+      router.push(`/sales/${newSale.id}`);
+    } else {
+      toast.error(error || "Error al crear el venta");
+    }
   };
 
   return (

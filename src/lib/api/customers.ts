@@ -39,7 +39,7 @@ export const customersApi = {
     });
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || "Error al obtener cliente");
+      throw new Error(errorData.message || "Error al crear cliente");
     }
     const result = await response.json();
     return result.data;

@@ -29,7 +29,7 @@ function Header() {
     <header className="border border-b-2 py-4">
       <div className="container mx-auto">
         <div className="flex items-center justify-between">
-          <Link href={"/"}>Payment Manager</Link>
+          <Link href={"/"} className="font-semibold">PAYMENTS</Link>
 
           <div className="flex items-center gap-5">
             <Navbar />

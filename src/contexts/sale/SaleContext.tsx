@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { handleClientError } from "@/lib/utils/client-error";
 import { salesApi } from "@/lib/api/sales";
 import { SaleContextType, SaleWithRelations } from "./sale.types";
+import { CreateSaleData } from "@/lib/validations/sale.schema";
 
 const SaleContext = createContext<SaleContextType | null>(null);
 
@@ -48,6 +49,25 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
   };
 
   // CREATE
+  const createSale = async (
+    data: CreateSaleData
+  ): Promise<SaleWithRelations | null> => {
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      const newSale = await salesApi.create(data);
+      setSale(newSale);
+      setSales((prev) => [...prev, newSale]);
+      return newSale;
+    } catch (error) {
+      setError(handleClientError(error));
+      return null;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // UPDATE
   // DELETE
 
@@ -66,6 +86,7 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
         error,
         getSales,
         getSale,
+        createSale,
       }}
     >
       {children}
