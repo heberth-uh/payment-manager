@@ -6,7 +6,9 @@ import { useParams, useRouter } from "next/navigation";
 import { useSales } from "@/contexts/sale/SaleContext";
 import { PageContainer } from "@/components/PageContainer";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash } from "lucide-react";
+import ConfirmaDialog from "@/components/ui/ConfirmaDialog";
+import { toast } from "sonner";
 
 function SalePage() {
   const params = useParams();
@@ -14,7 +16,17 @@ function SalePage() {
   const router = useRouter();
   if (!saleId) return <p>El ID de la venta es inválido</p>;
 
-  const { sale, isFetching, error, getSale } = useSales();
+  const dialogDescription = (
+    <span>
+      También se eliminarán todos los <b>pagos</b> asociados.
+      <br />
+      <br />
+      ¿Estás seguro de eliminar esta venta?
+      <br />
+      Esta acción no se puede deshacer.
+    </span>
+  );
+  const { sale, isFetching, error, getSale, deleteSale } = useSales();
 
   if (error) {
     return <PageContainer>Error {error}</PageContainer>; // TODO: Create Error component
@@ -23,6 +35,16 @@ function SalePage() {
   useEffect(() => {
     getSale(saleId); // TODO: Check why it seems like it called twice
   }, [saleId]);
+
+  const handleDeleteSale = async (id: string) => {
+    const success = await deleteSale(id);
+    if (success) {
+      toast.success("Se ha eliminado una venta");
+      router.push("/sales");
+    } else {
+      toast.error("No se pudo eliminar la venta");
+    }    
+  };
 
   return isFetching ? (
     <p>Cargando...</p>
@@ -52,9 +74,20 @@ function SalePage() {
         <p className="italic text-gray-500">{sale?.notes || "No hay notas"}</p>
       </div>
 
-      <div className="mt-6 flex justify-end">
+      <div className="mt-6 flex justify-end items-center gap-2">
+        <ConfirmaDialog
+          title="Eliminar venta"
+          description={dialogDescription}
+          confirmText="Eliminar"
+          actionConfirm={() => handleDeleteSale(saleId)}
+        >
+          <Button type="button" variant="secondary" size="sm" title="Eliminar">
+            <Trash />
+          </Button>
+        </ConfirmaDialog>
         <Button
           variant="secondary"
+          size="sm"
           onClick={() => router.push(`/sales/edit/${sale?.id}`)}
           title="Editar"
         >

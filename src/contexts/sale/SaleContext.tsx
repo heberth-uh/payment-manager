@@ -90,6 +90,20 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
   };
 
   // DELETE
+  const deleteSale = async (saleId: string): Promise<boolean> => {
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      await salesApi.delete(saleId);
+      setSales((prev) => prev.filter((s) => s.id !== saleId));
+      return true;
+    } catch (error) {
+      setError(handleClientError(error));
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Auto fetch sales on mount
   useEffect(() => {
@@ -108,6 +122,7 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
         getSale,
         createSale,
         updateSale,
+        deleteSale,
       }}
     >
       {children}
