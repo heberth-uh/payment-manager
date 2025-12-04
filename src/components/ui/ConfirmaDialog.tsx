@@ -14,7 +14,7 @@ import {
 interface ConfirmaDialogProps {
   children: React.ReactNode;
   title: string;
-  description?: string;
+  description?: string | React.ReactNode;
   confirmText?: string;
   cancelText?: string;
   actionConfirm?: () => void;
@@ -38,7 +38,7 @@ function ConfirmaDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{cancelText}</AlertDialogCancel>
-          <AlertDialogAction onClick={() => actionConfirm?.()}>
+          <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={() => actionConfirm?.()}>
             {confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>

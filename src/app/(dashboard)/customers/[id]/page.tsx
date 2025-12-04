@@ -36,6 +36,13 @@ function CustomerPage() {
     }
   };
 
+  const dialogDescription = (
+    <span>
+      ¿Estás seguro de eliminar a <b>{customer?.name}</b> de tu lista de
+      clientes? Esta acción no se puede deshacer.
+    </span>
+  );
+
   return isFetching ? (
     <p>Cargando...</p>
   ) : (
@@ -50,7 +57,7 @@ function CustomerPage() {
         <div className="flex gap-2">
           <ConfirmaDialog
             title="Eliminar cliente"
-            description={`¿Estás seguro de eliminar a ${customer?.name}? Esta acción no se puede deshacer.`}
+            description={dialogDescription}
             actionConfirm={() => handleDeleteCustomer(customerId)}
           >
             <Button
