@@ -58,7 +58,7 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
     try {
       const newSale = await salesApi.create(data);
       setSale(newSale);
-      setSales((prev) => [...prev, newSale]);
+      setSales((prev) => [newSale, ...prev]);
       return newSale;
     } catch (error) {
       setError(handleClientError(error));

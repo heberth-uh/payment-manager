@@ -55,6 +55,17 @@ function CustomerCombobox({
     }
   }, [initialCustomer]);
 
+  const handleOnSelect = (currentValue: string, customer: Customer) => {
+    if (currentValue === value) {
+      onChange("");
+      setCustomerName("");
+    } else {
+      onChange(currentValue);
+      setCustomerName(`${customer?.name} ${customer?.lastname}`);
+    }
+    setOpen(false);
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -65,9 +76,7 @@ function CustomerCombobox({
           className="justify-between"
           disabled={disabled}
         >
-          {customerName
-            ? customerName
-            : "Seleccionar un cliente"}
+          {customerName ? customerName : "Seleccionar un cliente"}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -88,11 +97,9 @@ function CustomerCombobox({
                 <CommandItem
                   key={customer.id}
                   value={customer.id}
-                  onSelect={(currentValue) => {
-                    setCustomerName(`${customer?.name} ${customer?.lastname}`) // FIXME: There's bug -- input can't be cleared on edition mode only
-                    onChange(currentValue === value ? "" : currentValue);
-                    setOpen(false);
-                  }}
+                  onSelect={(currentValue) =>
+                    handleOnSelect(currentValue, customer)
+                  }
                 >
                   {customer.name} {customer.lastname}
                   <Check
