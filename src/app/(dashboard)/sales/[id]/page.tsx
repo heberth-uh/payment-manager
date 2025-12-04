@@ -5,11 +5,13 @@ import { Label } from "@/components/ui/label";
 import { useParams, useRouter } from "next/navigation";
 import { useSales } from "@/contexts/sale/SaleContext";
 import { PageContainer } from "@/components/PageContainer";
+import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
 
 function SalePage() {
   const params = useParams();
   const saleId = Array.isArray(params.id) ? params.id[0] : params.id;
-
+  const router = useRouter();
   if (!saleId) return <p>El ID de la venta es inválido</p>;
 
   const { sale, isFetching, error, getSale } = useSales();
@@ -48,6 +50,16 @@ function SalePage() {
       <div>
         <Label>Notas</Label>
         <p className="italic text-gray-500">{sale?.notes || "No hay notas"}</p>
+      </div>
+
+      <div className="mt-6 flex justify-end">
+        <Button
+          variant="secondary"
+          onClick={() => router.push(`/sales/edit/${sale?.id}`)}
+          title="Editar"
+        >
+          <Pencil />
+        </Button>
       </div>
     </PageContainer>
   );

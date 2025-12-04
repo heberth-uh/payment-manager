@@ -64,10 +64,11 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
     if (isEditing && customerId) {
       if (!form.formState.isDirty) {
         router.push(`/customers/${customerId}`);
+        return;
       }
       const result = await updateCustomer(customerId, data);
       if (result) {
-        toast.success("Cliente actualizado exitosamente");
+        toast.success("Cliente actualizado con éxito");
         router.push(`/customers/${customerId}`);
       } else {
         toast.error(error || "Error al actualizar el cliente");

@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { handleClientError } from "@/lib/utils/client-error";
 import { salesApi } from "@/lib/api/sales";
 import { SaleContextType, SaleWithRelations } from "./sale.types";
-import { CreateSaleData } from "@/lib/validations/sale.schema";
+import { CreateSaleData, UpdateSaleData } from "@/lib/validations/sale.schema";
 
 const SaleContext = createContext<SaleContextType | null>(null);
 
@@ -69,6 +69,26 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
   };
 
   // UPDATE
+  const updateSale = async (
+    saleId: string,
+    data: UpdateSaleData
+  ): Promise<SaleWithRelations | null> => {
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      const updatedSale = await salesApi.update(saleId, data);
+      setSale(updatedSale);
+      setSales((prev) => prev.map((s) => (s.id === saleId ? updatedSale : s)));
+      return updatedSale;
+    } catch (error) {
+      setError(handleClientError(error));
+      return null;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // DELETE
 
   // Auto fetch sales on mount
@@ -87,6 +107,7 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
         getSales,
         getSale,
         createSale,
+        updateSale,
       }}
     >
       {children}

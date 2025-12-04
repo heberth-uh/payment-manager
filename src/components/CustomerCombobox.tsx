@@ -20,15 +20,24 @@ import {
 } from "@/components/ui/popover";
 import { useCustomerSearch } from "@/lib/hooks/useCustomerSearch";
 import { useDebounce } from "@/lib/hooks/useDebounce";
+import { Customer } from "@/generated/prisma/client";
 
 interface ComboboxProps {
   value: string;
   onChange: (value: string) => void;
+  initialCustomer?: Customer | null;
+  disabled?: boolean;
 }
 
-function CustomerCombobox({ value, onChange }: ComboboxProps) {
+function CustomerCombobox({
+  value,
+  onChange,
+  initialCustomer,
+  disabled,
+}: ComboboxProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [customerName, setCustomerName] = useState("");
   const { customers, isFetching, searchCustomers } = useCustomerSearch();
   const debouncedSearch = useDebounce(search, 300);
 
@@ -38,7 +47,13 @@ function CustomerCombobox({ value, onChange }: ComboboxProps) {
     }
   }, [debouncedSearch, open]);
 
-  const selectedCustomer = customers.find((c) => c.id === value);
+  // Set initial customer name if editing
+  useEffect(() => {
+    if (initialCustomer) {
+      const name = `${initialCustomer.name} ${initialCustomer.lastname}`;
+      setCustomerName(name);
+    }
+  }, [initialCustomer]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -48,9 +63,10 @@ function CustomerCombobox({ value, onChange }: ComboboxProps) {
           role="combobox"
           aria-expanded={open}
           className="justify-between"
+          disabled={disabled}
         >
-          {selectedCustomer
-            ? `${selectedCustomer.name} ${selectedCustomer.lastname}`
+          {customerName
+            ? customerName
             : "Seleccionar un cliente"}
           <ChevronsUpDown className="opacity-50" />
         </Button>
@@ -73,6 +89,7 @@ function CustomerCombobox({ value, onChange }: ComboboxProps) {
                   key={customer.id}
                   value={customer.id}
                   onSelect={(currentValue) => {
+                    setCustomerName(`${customer?.name} ${customer?.lastname}`) // FIXME: There's bug -- input can't be cleared on edition mode only
                     onChange(currentValue === value ? "" : currentValue);
                     setOpen(false);
                   }}

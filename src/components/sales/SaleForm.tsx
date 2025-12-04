@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Form,
   FormControl,
@@ -9,7 +9,6 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { Input } from "../ui/input";
 import { useForm } from "react-hook-form";
 import {
   CreateSaleData,
@@ -21,11 +20,22 @@ import { Textarea } from "../ui/textarea";
 import CustomerCombobox from "../CustomerCombobox";
 import { useSales } from "@/contexts/sale/SaleContext";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
-function SaleForm() {
+function SaleForm({ isEditing = false }: { isEditing?: boolean }) {
   const router = useRouter();
-  const { isFetching, error, createSale } = useSales();
+  const params = useParams();
+  const saleId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const {
+    sale,
+    isFetching,
+    isSubmitting,
+    error,
+    getSale,
+    createSale,
+    updateSale,
+  } = useSales();
+
   const form = useForm<CreateSaleData>({
     resolver: zodResolver(CreateSaleSchema),
     defaultValues: {
@@ -34,14 +44,45 @@ function SaleForm() {
     },
   });
 
+  // Fetch sale data when in editing mode
+  useEffect(() => {
+    if (isEditing && saleId) {
+      getSale(saleId);
+    }
+  }, [isEditing, saleId]);
+
+  // Reset form with sale data when is fetched
+  useEffect(() => {
+    if (isEditing && sale?.id === saleId && !form.formState.isDirty) {
+      form.reset({
+        customerId: sale?.customerId || "",
+        notes: sale?.notes || "",
+      });
+    }
+  }, [isEditing, sale, form]);
+
   const onsubmit = async (data: CreateSaleData) => {
-    const newSale = await createSale(data);
-    if (newSale) {
-      toast.success("Nueva venta creada");
-      form.reset();
-      router.push(`/sales/${newSale.id}`);
+    if (isEditing && saleId) {
+      if (!form.formState.isDirty) {
+        router.push(`/sales/${saleId}`);
+        return;
+      }
+      const result = await updateSale(saleId, data);
+      if (result) {
+        toast.success("Venta actualizada con éxito");
+        router.push(`/sales/${saleId}`);
+      } else {
+        toast.error(error || "Error al actualizar la venta");
+      }
     } else {
-      toast.error(error || "Error al crear el venta");
+      const newSale = await createSale(data);
+      if (newSale) {
+        toast.success("Nueva venta creada");
+        form.reset();
+        router.push(`/sales/${newSale.id}`);
+      } else {
+        toast.error(error || "Error al crear el venta");
+      }
     }
   };
 
@@ -59,6 +100,8 @@ function SaleForm() {
                   <CustomerCombobox
                     onChange={field.onChange}
                     value={field.value}
+                    initialCustomer={isEditing ? sale?.customer : null}
+                    disabled={isFetching || isSubmitting}
                   />
                 </FormControl>
                 <FormMessage />
@@ -76,6 +119,7 @@ function SaleForm() {
                 <FormControl>
                   <Textarea
                     placeholder="Agregar una nota o comentario"
+                    disabled={isFetching || form.formState.isSubmitting}
                     {...field}
                   />
                 </FormControl>
@@ -85,7 +129,12 @@ function SaleForm() {
           />
         </div>
         <div className="flex items-center justify-between gap-4">
-          <Button type="button" className="flex-1" variant="secondary">
+          <Button
+            type="button"
+            className="flex-1"
+            variant="secondary"
+            onClick={() => router.back()}
+          >
             Cancelar
           </Button>
           <Button type="submit" className="flex-1">

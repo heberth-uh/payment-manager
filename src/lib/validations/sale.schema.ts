@@ -15,4 +15,4 @@ export const CreateSaleSchema = z.object({
 export const UpdateSaleSchema = CreateSaleSchema.partial();
 
 export type CreateSaleData = z.infer<typeof CreateSaleSchema>;
-export type UpdateCustomerData = z.infer<typeof UpdateSaleSchema>;
+export type UpdateSaleData = z.infer<typeof UpdateSaleSchema>;

@@ -1,5 +1,5 @@
 import { Prisma } from "@/generated/prisma/client";
-import { CreateSaleData } from "@/lib/validations/sale.schema";
+import { CreateSaleData, UpdateSaleData } from "@/lib/validations/sale.schema";
 
 export type SaleWithRelations = Prisma.SaleGetPayload<{
   include: { customer: true };
@@ -14,4 +14,8 @@ export interface SaleContextType {
   getSales: () => Promise<void>;
   getSale: (saleId: string, forceRefresh?: boolean) => Promise<void>;
   createSale: (data: CreateSaleData) => Promise<SaleWithRelations | null>;
+  updateSale: (
+    saleId: string,
+    data: UpdateSaleData
+  ) => Promise<SaleWithRelations | null>;
 }

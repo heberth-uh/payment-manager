@@ -1,5 +1,5 @@
 import { SaleWithRelations } from "@/contexts/sale/sale.types";
-import { CreateSaleData, CreateSaleSchema } from "../validations/sale.schema";
+import { CreateSaleData, UpdateSaleData } from "../validations/sale.schema";
 
 export const salesApi = {
   // GET ALL
@@ -34,6 +34,24 @@ export const salesApi = {
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Error al crear venta");
+    }
+    const result = await response.json();
+    return result.data;
+  },
+
+  // UPDATE
+  async update(
+    saleId: string,
+    data: UpdateSaleData
+  ): Promise<SaleWithRelations> {
+    const response = await fetch(`/api/sales/${saleId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.meessage || "Error al actualizar venta");
     }
     const result = await response.json();
     return result.data;

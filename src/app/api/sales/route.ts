@@ -54,6 +54,7 @@ export async function POST(request: NextRequest) {
         ...data,
         userId: session.user.id,
       },
+      include: { customer: true },
     });
     return NextResponse.json(
       { meessage: "Sale created successfully", data: result },
