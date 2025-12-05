@@ -9,6 +9,7 @@ import { useCustomers } from "@/contexts/customer/CustomerContext";
 import { MapPin, Pencil, Phone, Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { PageContainer } from "@/components/PageContainer";
 
 function CustomerPage() {
   const params = useParams();
@@ -46,7 +47,7 @@ function CustomerPage() {
   return isFetching ? (
     <p>Cargando...</p>
   ) : (
-    <div>
+    <PageContainer>
       <div className="flex justify-between items-center">
         <div>
           <Label>Nombre</Label>
@@ -85,7 +86,7 @@ function CustomerPage() {
         <MapPin className="size-4" />
         <p>{customer?.address || "Sin dirección"}</p>
       </div>
-    </div>
+    </PageContainer>
   );
 }
 

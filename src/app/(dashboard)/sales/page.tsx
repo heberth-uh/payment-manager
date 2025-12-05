@@ -50,7 +50,9 @@ function SalesPage() {
                   href={`/sales/${sale.id}`}
                   className="flex justify-between items-center"
                 >
-                  <p>{sale.customer.name}</p>
+                  <p>
+                    {`${sale?.customer.name}${" " + sale?.customer.lastname}`}
+                  </p>
                   <p>{sale.lastSaleDate.toLocaleString()}</p>
                   <div>{sale.status}</div>
                 </Link>
