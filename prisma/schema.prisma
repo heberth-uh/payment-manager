@@ -104,9 +104,33 @@ model Sale {
   // Customer relation
   customerId      String
   customer        Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  products        Product[]
 
   @@index([userId])
   @@map("sale")
+}
+
+// ---------- Product ----------
+
+model Product {
+  id            String   @id @default(cuid())
+  name          String
+  url           String?
+  note          String?
+  saleDate      DateTime
+  purchasePrice Float
+  unitPrice     Float
+  quantity      Int      @default(1)
+  subtotal      Float // purchasePrice * quantity
+  profit        Float // (unitPrice - purchasePrice) * quantity
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  // Sale relation
+  saleId        String
+  sale          Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  @@index([saleId])
+  @@map("product")
 }
 
 // ---------------------------
