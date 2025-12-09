@@ -19,6 +19,7 @@ model User {
   accounts      Account[]
   customers     Customer[]
   sales         Sale[]
+  products      Product[]
 
   @@unique([email])
   @@map("user")
@@ -128,6 +129,9 @@ model Product {
   // Sale relation
   saleId        String
   sale          Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  // User relation
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([saleId])
   @@map("product")
