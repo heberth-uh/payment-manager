@@ -1,6 +1,7 @@
 import { getServerSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
+import { UpdateProductSchema } from "@/lib/validations/product.shcema";
 import { NextRequest, NextResponse } from "next/server";
 
 // Get a product
@@ -31,6 +32,38 @@ export async function GET(
       { message: "Product retrieved successfully", data: product },
       { status: 200 }
     );
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Edit a product
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const body = await request.json();
+    const session = await getServerSession();
+
+    if (!session?.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    // TODO: Check if quantity, unitPrice or purchasePrice have changed to update subtotal and profit
+
+    // Validate the request body
+    const data = UpdateProductSchema.parse(body);
+    const result = await prisma.product.update({
+      where: { id, userId: session.user.id },
+      data,
+    });
+
+    return NextResponse.json({
+      message: "Product updated successfully",
+      data: result,
+    });
   } catch (error) {
     return handleApiError(error);
   }
