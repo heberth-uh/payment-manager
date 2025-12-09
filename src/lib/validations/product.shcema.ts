@@ -12,7 +12,7 @@ export const CreateProductSchema = z.object({
     .max(500, "Agregue un comentario de máximo 500 caracteres")
     .trim()
     .optional(),
-  saleDate: z.date().optional(),
+  saleDate: z.coerce.date(),
   purchasePrice: z
     .number("El precio de compra es requerido")
     .positive("El precio de compra debe ser mayor a 0"),

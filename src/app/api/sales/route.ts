@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       include: { customer: true },
     });
     return NextResponse.json(
-      { meessage: "Sale created successfully", data: result },
+      { message: "Sale created successfully", data: result },
       { status: 201 }
     );
   } catch (error) {
