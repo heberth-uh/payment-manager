@@ -92,3 +92,28 @@ export async function PUT(
     return handleApiError(error);
   }
 }
+
+// Delete a product
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const session = await getServerSession();
+
+    if (!session?.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const result = await prisma.product.delete({
+      where: { id, userId: session.user.id },
+    });
+    return NextResponse.json({
+      message: "Product deleted successfully",
+      data: result,
+    });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
