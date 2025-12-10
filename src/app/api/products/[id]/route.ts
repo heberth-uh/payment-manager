@@ -51,13 +51,37 @@ export async function PUT(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    // TODO: Check if quantity, unitPrice or purchasePrice have changed to update subtotal and profit
-
     // Validate the request body
     const data = UpdateProductSchema.parse(body);
+
+    // Get existing product
+    const existing = await prisma.product.findUnique({
+      where: { id, userId: session.user.id },
+      select: {
+        unitPrice: true,
+        purchasePrice: true,
+        quantity: true,
+      },
+    });
+    if (!existing) {
+      return NextResponse.json(
+        { message: "Producto no encontrado" },
+        { status: 404 }
+      );
+    }
+
+    // Update calculated fields
+    const unitPrice = data.unitPrice ?? existing.unitPrice;
+    const purchasePrice = data.purchasePrice ?? existing.purchasePrice;
+    const quantity = data.quantity ?? existing.quantity;
+
+    const subtotal = unitPrice * quantity;
+    const profit = (unitPrice - purchasePrice) * quantity;
+
+    // Update product
     const result = await prisma.product.update({
       where: { id, userId: session.user.id },
-      data,
+      data: { ...data, subtotal, profit },
     });
 
     return NextResponse.json({
