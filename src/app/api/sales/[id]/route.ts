@@ -17,7 +17,7 @@ export async function GET(
     }
 
     const sale = await prisma.sale.findUnique({
-      include: { customer: true },
+      include: { customer: true, products: true },
       where: { id, userId: session?.user.id },
     });
 

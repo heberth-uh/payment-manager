@@ -120,6 +120,7 @@ function SaleForm({ isEditing = false }: { isEditing?: boolean }) {
                   <Textarea
                     placeholder="Agregar una nota o comentario"
                     disabled={isFetching || form.formState.isSubmitting}
+                    className="resize-none"
                     {...field}
                   />
                 </FormControl>

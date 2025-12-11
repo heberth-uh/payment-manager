@@ -43,7 +43,7 @@ function SalePage() {
       router.push("/sales");
     } else {
       toast.error("No se pudo eliminar la venta");
-    }    
+    }
   };
 
   return isFetching ? (
@@ -69,6 +69,36 @@ function SalePage() {
         <Label>Fecha de última venta</Label>
         <p>{sale?.lastSaleDate.toLocaleString()}</p>
       </div>
+
+      <div className="mt-6 mb-2 border rounded-sm p-2">
+        {sale?.products.length ? (
+          <>
+            <h3>Productos ({sale.products.length})</h3>
+            <div className="mt-2 space-y-2">
+              {sale.products.map((product) => (
+                <div
+                  key={product.id}
+                  className="flex justify-between items-center bg-gray-50 border rounded-sm p-2"
+                >
+                  <div className="w-4/5 space-y-1">
+                    <p className="text-sm line-clamp-1">{product.name}</p>
+                    <div className="flex justify-between items-center text-xs italic">
+                      <p>{product.saleDate.toLocaleString()}</p>
+                    </div>
+                  </div>
+                  <div className="w-1/5 text-right">
+                    <p className="font-semibold text-sm">${product.subtotal}</p>
+                    <p className="text-xs">&times;{product.quantity}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div>No hay productos</div>
+        )}
+      </div>
+
       <div>
         <Label>Notas</Label>
         <p className="italic text-gray-500">{sale?.notes || "No hay notas"}</p>

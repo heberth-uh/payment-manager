@@ -2,7 +2,7 @@ import { Prisma } from "@/generated/prisma/client";
 import { CreateSaleData, UpdateSaleData } from "@/lib/validations/sale.schema";
 
 export type SaleWithRelations = Prisma.SaleGetPayload<{
-  include: { customer: true };
+  include: { customer: true, products: true };
 }>;
 
 export interface SaleContextType {
