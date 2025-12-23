@@ -9,7 +9,7 @@ import { useCustomers } from "@/contexts/customer/CustomerContext";
 import { MapPin, Pencil, Phone, Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { PageContainer } from "@/components/PageContainer";
+import { PageContainer } from "@/components/layout/PageContainer";
 
 function CustomerPage() {
   const params = useParams();

@@ -1,4 +1,4 @@
-import { PageContainer } from "@/components/PageContainer";
+import { PageContainer } from "@/components/layout/PageContainer";
 import SaleForm from "@/components/sales/SaleForm";
 import React from "react";
 

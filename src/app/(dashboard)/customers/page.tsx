@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { PageContainer } from "@/components/PageContainer";
+import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
 import ConfirmaDialog from "@/components/ui/ConfirmaDialog";
 import { toast } from "sonner";

@@ -1,6 +1,6 @@
 "use client";
 
-import { PageContainer } from "@/components/PageContainer";
+import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
 import { useSales } from "@/contexts/sale/SaleContext";
 import { RefreshCw } from "lucide-react";

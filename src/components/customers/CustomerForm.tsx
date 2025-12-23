@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "../ui/form";
 import { useForm } from "react-hook-form";
 import {
   CreateCustomerData,
   CreateCustomerSchema,
 } from "@/lib/validations/customer.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useCustomers } from "@/contexts/customer/CustomerContext";

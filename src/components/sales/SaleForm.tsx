@@ -17,7 +17,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
-import CustomerCombobox from "../CustomerCombobox";
+import CustomerCombobox from "../customers/CustomerCombobox";
 import { useSales } from "@/contexts/sale/SaleContext";
 import { toast } from "sonner";
 import { useParams, useRouter } from "next/navigation";

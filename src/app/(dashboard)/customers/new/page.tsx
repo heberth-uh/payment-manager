@@ -1,5 +1,5 @@
-import CustomerForm from "@/components/CustomerForm";
-import { PageContainer } from "@/components/PageContainer";
+import CustomerForm from "@/components/customers/CustomerForm";
+import { PageContainer } from "@/components/layout/PageContainer";
 import React from "react";
 
 function NewCustomerPage() {

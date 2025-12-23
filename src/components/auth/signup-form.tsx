@@ -1,7 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { cn } from "@/lib/utils";
+import z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
 import {
   Card,
   CardContent,
@@ -10,10 +17,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import z from "zod";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
@@ -21,53 +24,55 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
-import { authClient } from "@/lib/auth-client";
-import { toast } from "sonner";
-import { useState } from "react";
+} from "../ui/form";
 
-const signInSchema = z.object({
-  email: z.email({ message: "Please enter a valid email" }),
-  password: z.string().min(1, { message: "Password is required" }),
+const SignUpSchema = z.object({
+  name: z.string().min(2, { message: "Name is required" }),
+  email: z.email({ message: "Please enter a valid email email" }),
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters long" }),
+  passwordConfirmation: z
+    .string()
+    .min(1, { message: "Please confirm your password" }),
 });
 
-type SignInValues = z.infer<typeof signInSchema>;
+type SignUpValues = z.infer<typeof SignUpSchema>;
 
-export function LoginForm({
+export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const form = useForm<SignInValues>({
-    resolver: zodResolver(signInSchema),
+  const form = useForm<SignUpValues>({
+    resolver: zodResolver(SignUpSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
+      passwordConfirmation: "",
     },
   });
 
-  async function onSubmit({ email, password }: SignInValues) {
+  async function onSubmit({ name, email, password }: SignUpValues) {
     setError(null);
-    try {
-      const result = await authClient.signIn.email({
-        email,
-        password,
-      });
 
-      if (result?.error) {
-        const msg = result.error.message || "Something went wrong";
-        toast.error(msg);
-        setError(msg);
-      } else {
-        toast.success("Logged successfully");
-        router.push("/");
-      }
-    } catch (err: any) {
-      const msg = err?.message || "Unexpected error during sign in";
-      toast.error(msg);
-      setError(msg);
+    const { error } = await authClient.signUp.email({
+      email,
+      password,
+      name,
+      callbackURL: "/",
+    });
+
+    if (error) {
+      let errorMessage = error.message || "Something went wrong";
+      toast.error(errorMessage);
+      setError(errorMessage);
+    } else {
+      toast.success("Signed up successfully");
+      router.push("/");
     }
   }
 
@@ -75,14 +80,14 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
+          <CardTitle className="text-xl">Sign Up</CardTitle>
           <CardDescription>
-            Login with your Apple or Google account
+            Sign up with your Apple or Google account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
+            <form onSubmit={form.handleSubmit(onSubmit)}>
               <div className="grid gap-6">
                 <div className="flex flex-col gap-4">
                   <Button variant="outline" className="w-full">
@@ -92,7 +97,7 @@ export function LoginForm({
                         fill="currentColor"
                       />
                     </svg>
-                    Login with Apple
+                    Sign up with Apple
                   </Button>
                   <Button variant="outline" className="w-full">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -101,7 +106,7 @@ export function LoginForm({
                         fill="currentColor"
                       />
                     </svg>
-                    Login with Google
+                    Sign up with Google
                   </Button>
                 </div>
                 <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
@@ -110,6 +115,19 @@ export function LoginForm({
                   </span>
                 </div>
                 <div className="grid gap-6">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Full Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="shadcn" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <FormField
                     control={form.control}
                     name="email"
@@ -128,15 +146,7 @@ export function LoginForm({
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <div className="flex items-center">
-                          <FormLabel>Password</FormLabel>
-                          <a
-                            href="#"
-                            className="ml-auto text-sm underline-offset-4 hover:underline"
-                          >
-                            Forgot your password?
-                          </a>
-                        </div>
+                        <FormLabel>Password</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="********"
@@ -148,19 +158,38 @@ export function LoginForm({
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={form.control}
+                    name="passwordConfirmation"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="********"
+                            {...field}
+                            type="password"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   {error && (
                     <div role="alert" className="text-sm text-red-600">
                       {error}
                     </div>
                   )}
+
                   <Button type="submit" className="w-full">
-                    Login
+                    Sign Up
                   </Button>
                 </div>
                 <div className="text-center text-sm">
-                  Don&apos;t have an account?{" "}
-                  <a href="/sign-up" className="underline underline-offset-4">
-                    Sign up
+                  Already have an account?{" "}
+                  <a href="/login" className="underline underline-offset-4">
+                    Login
                   </a>
                 </div>
               </div>

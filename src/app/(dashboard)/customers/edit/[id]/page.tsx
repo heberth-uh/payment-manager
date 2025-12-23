@@ -1,6 +1,6 @@
 import React from "react";
-import { PageContainer } from "@/components/PageContainer";
-import CustomerForm from "@/components/CustomerForm";
+import { PageContainer } from "@/components/layout/PageContainer";
+import CustomerForm from "@/components/customers/CustomerForm";
 
 function EditCustomerPage() {
   return (

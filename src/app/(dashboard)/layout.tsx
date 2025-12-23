@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+import Header from "@/components/layout/Header";
 import { getServerSession } from "@/lib/get-session";
 import React from "react";
 import Unauthorized from "../unauthorized";

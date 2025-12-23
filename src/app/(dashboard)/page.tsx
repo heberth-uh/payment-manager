@@ -1,5 +1,5 @@
 import { getServerSession } from "@/lib/get-session";
-import { PageContainer } from "@/components/PageContainer";
+import { PageContainer } from "@/components/layout/PageContainer";
 
 export default async function Home() {
   const session = await getServerSession();

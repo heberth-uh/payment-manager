@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { useParams, useRouter } from "next/navigation";
 import { useSales } from "@/contexts/sale/SaleContext";
-import { PageContainer } from "@/components/PageContainer";
+import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash } from "lucide-react";
 import ConfirmaDialog from "@/components/ui/ConfirmaDialog";
