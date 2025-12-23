@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Trash } from "lucide-react";
 import ConfirmaDialog from "@/components/ui/ConfirmaDialog";
 import { toast } from "sonner";
+import SideSheet from "@/components/ui/SideSheet";
 
 function SalePage() {
   const params = useParams();
@@ -73,7 +74,18 @@ function SalePage() {
       <div className="mt-6 mb-2 border rounded-sm p-2">
         {sale?.products.length ? (
           <>
-            <h3>Productos ({sale.products.length})</h3>
+            <div className="flex justify-between items-center">
+              <h3>Productos ({sale.products.length})</h3>
+              <SideSheet
+                title="Crear producto"
+                description="Descripción opcional"
+                content={<p>Hi, this is a Sheet component! <br /> Here goes Product component</p>}
+              >
+                <Button variant="default" size="sm">
+                  Open
+                </Button>                
+              </SideSheet>
+            </div>
             <div className="mt-2 space-y-2">
               {sale.products.map((product) => (
                 <div
