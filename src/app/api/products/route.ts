@@ -1,7 +1,7 @@
 import { getServerSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
-import { CreateProductSchema } from "@/lib/validations/product.shcema";
+import { CreateProductSchema } from "@/lib/validations/product.schema";
 import { NextRequest, NextResponse } from "next/server";
 
 // Get all products
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     // Validate the request body
     const data = CreateProductSchema.parse(body);
     const result = await prisma.product.create({
-      data: {
+      data: { // FIXME: Check saleDate type
         ...data,
         subtotal: data.unitPrice * data.quantity,
         profit: (data.unitPrice - data.purchasePrice) * data.quantity,

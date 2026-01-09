@@ -10,6 +10,7 @@ import { Pencil, Trash } from "lucide-react";
 import ConfirmaDialog from "@/components/ui/ConfirmaDialog";
 import { toast } from "sonner";
 import SideSheet from "@/components/ui/SideSheet";
+import ProductView from "@/components/products/ProductView";
 
 function SalePage() {
   const params = useParams();
@@ -79,10 +80,10 @@ function SalePage() {
               <SideSheet
                 title="Crear producto"
                 description="Descripción opcional"
-                content={<p>Hi, this is a Sheet component! <br /> Here goes Product component</p>}
+                content={(closeSheet) => <ProductView mode="create" onSuccess={closeSheet}/>}
               >
                 <Button variant="default" size="sm">
-                  Open
+                  + Nuevo
                 </Button>                
               </SideSheet>
             </div>

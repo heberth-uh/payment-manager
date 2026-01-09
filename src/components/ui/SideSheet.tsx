@@ -9,14 +9,16 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useState } from "react";
 
 interface SideSheetProps {
   children: React.ReactNode;
-  content: React.ReactNode;
+  content: (closeSheet: () => void) => React.ReactNode;
   title: string;
   description?: string | React.ReactNode;
   saveText?: string;
   closeText?: string;
+  showFooter?: boolean;
 }
 
 export function SideSheet({
@@ -24,24 +26,29 @@ export function SideSheet({
   content,
   title,
   description,
-  saveText = "Save changes",
-  closeText = "Close",
+  closeText = "Cerrar",
+  showFooter = false,
 }: SideSheetProps) {
+  const [open, setOpen] = useState(false);
+
+  const closesheet = () => setOpen(false);
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent side="bottom" className="h-[90vh]">
-        <SheetHeader>
+        <SheetHeader className="pb-0">
           <SheetTitle>{title}</SheetTitle>
           <SheetDescription>{description}</SheetDescription>
         </SheetHeader>
-        <div className="px-4">{content}</div>
-        <SheetFooter>
-          <Button type="submit">{saveText}</Button>
-          <SheetClose asChild>
-            <Button variant="outline">{closeText}</Button>
-          </SheetClose>
-        </SheetFooter>
+        <div className="flex-1 overflow-y-auto">{content(closesheet)}</div>
+        {showFooter && (
+          <SheetFooter className="flex-row justify-between gap-2 border-t-2">
+            <Button variant="default" onClick={closesheet} className="grow">
+              {closeText}
+            </Button>
+          </SheetFooter>
+        )}
       </SheetContent>
     </Sheet>
   );

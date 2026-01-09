@@ -1,7 +1,7 @@
 import { getServerSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
-import { UpdateProductSchema } from "@/lib/validations/product.shcema";
+import { UpdateProductSchema } from "@/lib/validations/product.schema";
 import { NextRequest, NextResponse } from "next/server";
 
 // Get a product
