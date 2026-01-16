@@ -40,8 +40,9 @@ export async function POST(request: NextRequest) {
     // Validate the request body
     const data = CreateProductSchema.parse(body);
     const result = await prisma.product.create({
-      data: { // FIXME: Check saleDate type
+      data: {
         ...data,
+        saleDate: new Date(data.saleDate),
         subtotal: data.unitPrice * data.quantity,
         profit: (data.unitPrice - data.purchasePrice) * data.quantity,
         userId: session.user.id,

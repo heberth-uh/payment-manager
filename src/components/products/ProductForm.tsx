@@ -18,43 +18,51 @@ import {
   CreateProductData,
   CreateProductSchema,
 } from "@/lib/validations/product.schema";
+import { getTodayLocalISODate } from "@/lib/utils/date";
+import { useSales } from "@/contexts/sale/SaleContext";
+import { useParams } from "next/navigation";
+import { toast } from "sonner";
 
 interface ProductFormProps {
   onSuccess?: () => void;
 }
 
-// TODO: Move to utils
-const todayLocalISODate = () => {
-  const date = new Date();
-  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-  return date.toISOString().split("T")[0];
-};
-
 function ProductForm({ onSuccess }: ProductFormProps) {
+  const params = useParams();
+  const saleId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const { isSubmitting, addProduct } = useSales();
+
   const form = useForm<CreateProductData>({
     resolver: zodResolver(CreateProductSchema) as Resolver<CreateProductData>,
     defaultValues: {
       name: "",
       url: "",
       note: "",
-      saleDate: todayLocalISODate(),
+      saleDate: getTodayLocalISODate(),
       purchasePrice: 0,
       unitPrice: 0,
       quantity: 1,
-      saleId: "mir0o6r00000okv4onpondco",
+      saleId: saleId || "",
     },
   });
 
   const unitPrice = form.watch("unitPrice") || 0;
   const purchasePrice = form.watch("purchasePrice") || 0;
-  const profit = unitPrice - purchasePrice;
-  const subtotal = unitPrice * (form.watch("quantity") || 1);
+  const quantity = form.watch("quantity") || 1;
+  const unitProfit = unitPrice - purchasePrice;
+  const totalProfit = unitProfit * quantity;
+  const subtotal = unitPrice * quantity;
 
-  const onSubmit = (data: CreateProductData) => {
-    // TODO: Here goes the logic to submit the form data
+  const onSubmit = async (data: CreateProductData) => {
     console.log("submitting", data);
-    form.reset();
-    onSuccess?.();
+    const newProduct = await addProduct(data);
+    if (newProduct) {
+      toast.success("Se agregó un producto a la venta");
+      form.reset();
+      onSuccess?.();
+    } else {
+      toast.error("No se pudo agregar el producto");
+    }
   };
 
   const onCancel = () => {
@@ -76,31 +84,17 @@ function ProductForm({ onSuccess }: ProductFormProps) {
               <FormItem>
                 <FormLabel>Nombre</FormLabel>
                 <FormControl>
-                  <Input placeholder="Nombre del producto*" {...field} />
+                  <Input
+                    placeholder="Nombre del producto*"
+                    {...field}
+                    disabled={isSubmitting || form.formState.isSubmitting}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
           <div className="grid grid-cols-2 gap-6">
-            <FormField
-              control={form.control}
-              name="purchasePrice"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Precio de compra</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="unitPrice"
@@ -113,6 +107,26 @@ function ProductForm({ onSuccess }: ProductFormProps) {
                       step="0.01"
                       placeholder="0.00"
                       {...field}
+                      disabled={isSubmitting || form.formState.isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="purchasePrice"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Precio de compra</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      {...field}
+                      disabled={isSubmitting || form.formState.isSubmitting}
                     />
                   </FormControl>
                   <FormMessage />
@@ -120,14 +134,26 @@ function ProductForm({ onSuccess }: ProductFormProps) {
               )}
             />
           </div>
-          <div className="grid grid-cols-2 gap-6 bg-gray-100 p-2 rounded-sm">
-            <p className="text-sm font-medium">Ganancia estimada</p>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-2 bg-gray-100 p-2 rounded-sm">
+            <p
+              className={`text-sm font-medium ${quantity < 2 ? "hidden" : ""}`}
+            >
+              Ganancia unitaria
+            </p>
             <p
               className={`text-sm font-bold ${
-                profit < 0 ? "text-destructive" : "text-primary"
+                unitProfit < 0 ? "text-destructive" : "text-primary"
+              } ${quantity < 2 ? "hidden" : ""}`}
+            >
+              ${unitProfit.toFixed(2)}
+            </p>
+            <p className="text-sm font-medium">Ganancia total</p>
+            <p
+              className={`text-sm font-bold ${
+                totalProfit < 0 ? "text-destructive" : "text-primary"
               }`}
             >
-              ${profit.toFixed(2)}
+              ${totalProfit.toFixed(2)}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-6">
@@ -138,7 +164,11 @@ function ProductForm({ onSuccess }: ProductFormProps) {
                 <FormItem>
                   <FormLabel>Cantidad*</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} />
+                    <Input
+                      type="number"
+                      {...field}
+                      disabled={isSubmitting || form.formState.isSubmitting}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -151,7 +181,11 @@ function ProductForm({ onSuccess }: ProductFormProps) {
                 <FormItem>
                   <FormLabel>Fecha de venta</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input
+                      type="date"
+                      {...field}
+                      disabled={isSubmitting || form.formState.isSubmitting}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -172,7 +206,7 @@ function ProductForm({ onSuccess }: ProductFormProps) {
                   <Input
                     placeholder="Link de Shein/Amazon"
                     {...field}
-                    value={field.value ?? ""}
+                    disabled={isSubmitting || form.formState.isSubmitting}
                   />
                 </FormControl>
                 <FormMessage />
@@ -189,7 +223,7 @@ function ProductForm({ onSuccess }: ProductFormProps) {
                   <Textarea
                     placeholder="Comentarios adicionales del producto"
                     {...field}
-                    value={field.value ?? ""}
+                    disabled={isSubmitting || form.formState.isSubmitting}
                   />
                 </FormControl>
                 <FormMessage />
@@ -205,7 +239,7 @@ function ProductForm({ onSuccess }: ProductFormProps) {
             className="grow"
           >
             Cancelar
-          </Button>
+          </Button> {/* TODO: Add a confirmation dialog */}
           <Button type="submit" className="grow">
             Guardar
           </Button>

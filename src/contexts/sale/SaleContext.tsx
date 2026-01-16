@@ -5,6 +5,9 @@ import { handleClientError } from "@/lib/utils/client-error";
 import { salesApi } from "@/lib/api/sales";
 import { SaleContextType, SaleWithRelations } from "./sale.types";
 import { CreateSaleData, UpdateSaleData } from "@/lib/validations/sale.schema";
+import { CreateProductData } from "@/lib/validations/product.schema";
+import { productsApi } from "@/lib/api/product";
+import { Product } from "@/generated/prisma/client";
 
 const SaleContext = createContext<SaleContextType | null>(null);
 
@@ -105,6 +108,37 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // -----------------------
+  // PRODUCT MANAGEMENT
+  // -----------------------
+
+  // ADD A PRODUCT TO A SALE
+  const addProduct = async (
+    data: CreateProductData
+  ): Promise<Product | null> => {
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      const newProduct = await productsApi.create(data);
+
+      if (sale && sale.id === data.saleId) {
+        setSale({
+          ...sale,
+          products: [...(sale.products || []), newProduct],
+        });
+      }
+      return newProduct;
+    } catch (error) {
+      setError(handleClientError(error));
+      return null;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // UPDATE A PRODUCT IN A SALE
+  // REMOVE A PRODUCT FROM A SALE
+
   // Auto fetch sales on mount
   useEffect(() => {
     getSales();
@@ -123,6 +157,7 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
         createSale,
         updateSale,
         deleteSale,
+        addProduct,
       }}
     >
       {children}
