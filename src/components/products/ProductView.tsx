@@ -2,13 +2,14 @@ import React from "react";
 import ProductForm from "./ProductForm";
 
 interface ProductViewProps {
-  mode?: "view" | "create" | "edit"; // Maybe we only need "create"and "edit"
+  mode?: "create" | "edit";
+  saleId: string;
   onSuccess?: () => void;
 }
 
-function ProductView({ mode = "view", onSuccess }: ProductViewProps) {
+function ProductView({ mode, saleId, onSuccess }: ProductViewProps) {
   if (mode === "create") {
-    return <ProductForm onSuccess={onSuccess} />;
+    return <ProductForm saleId={saleId} onSuccess={onSuccess} />;
   }
   return (
     <div>

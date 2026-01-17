@@ -52,6 +52,8 @@ function CustomerCombobox({
     if (initialCustomer) {
       const name = `${initialCustomer.name} ${initialCustomer.lastname}`;
       setCustomerName(name);
+    } else {
+      setCustomerName("");
     }
   }, [initialCustomer]);
 

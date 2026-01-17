@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "../ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "../ui/form";
 import { useForm } from "react-hook-form";
 import {
   CreateCustomerData,
@@ -58,8 +64,7 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
         address: customer?.address || "",
       });
     }
-  }, [isEditing, customer, form]);
-
+  }, [isEditing, customer, customerId, form]);
   const onSubmit = async (data: CreateCustomerData) => {
     if (isEditing && customerId) {
       if (!form.formState.isDirty) {
@@ -71,7 +76,7 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
         toast.success("Cliente actualizado con éxito");
         router.push(`/customers/${customerId}`);
       } else {
-        toast.error(error || "Error al actualizar el cliente");
+        toast.error(error || "Error al actualizar el cliente"); // FIXME: When we get an error. The customer view page shows the error instead of the details. it must show the error in the toast and then clean the error. Fix this behavior in all form components
       }
     } else {
       const newCustomer = await createCustomer(data);
@@ -80,7 +85,7 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
         form.reset();
         router.push(`/customers/${newCustomer.id}`);
       } else {
-        toast.error(error || "Error al crear el cliente");
+        toast.error(error || "Error al crear el cliente"); 
       }
     }
   };

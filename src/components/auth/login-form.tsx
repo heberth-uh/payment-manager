@@ -153,10 +153,9 @@ export function LoginForm({
                       {error}
                     </div>
                   )}
-                  <Button type="submit" className="w-full">
-                    Login
-                  </Button>
-                </div>
+                  <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                    {form.formState.isSubmitting ? "Logging in..." : "Login"}
+                  </Button>                </div>
                 <div className="text-center text-sm">
                   Don&apos;t have an account?{" "}
                   <a href="/sign-up" className="underline underline-offset-4">

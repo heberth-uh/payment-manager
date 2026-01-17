@@ -28,7 +28,7 @@ import {
 
 const SignUpSchema = z.object({
   name: z.string().min(2, { message: "Name is required" }),
-  email: z.email({ message: "Please enter a valid email email" }),
+  email: z.email({ message: "Please enter a valid email" }),
   password: z
     .string()
     .min(8, { message: "Password must be at least 8 characters long" }),

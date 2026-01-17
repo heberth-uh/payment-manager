@@ -73,14 +73,14 @@ function SalePage() {
       </div>
 
       <div className="mt-6 mb-2 border rounded-sm p-2">
-        {sale?.products.length ? (
+        {sale?.products?.length ? (
           <>
             <div className="flex justify-between items-center">
               <h3>Productos ({sale.products.length})</h3>
               <SideSheet
                 title="Crear producto"
                 description="Descripción opcional"
-                content={(closeSheet) => <ProductView mode="create" onSuccess={closeSheet}/>}
+                content={(closeSheet) => <ProductView mode="create" saleId={saleId} onSuccess={closeSheet}/>}
               >
                 <Button variant="default" size="sm">
                   + Nuevo
@@ -108,9 +108,19 @@ function SalePage() {
             </div>
           </>
         ) : (
-          <div>No hay productos</div>
-        )}
-      </div>
+          <div className="flex justify-between items-center">
+            <span>No hay productos</span>
+            <SideSheet
+              title="Crear producto"
+              description="Descripción opcional"
+              content={(closeSheet) => <ProductView mode="create" saleId={saleId} onSuccess={closeSheet}/>}
+            >
+              <Button variant="default" size="sm">
+                 + Nuevo
+              </Button>
+            </SideSheet>
+          </div>
+        )}      </div>
 
       <div>
         <Label>Notas</Label>

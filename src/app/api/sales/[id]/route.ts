@@ -56,7 +56,7 @@ export async function PUT(
     const result = await prisma.sale.update({
       where: { id, userId: session.user.id },
       data,
-      include: { customer: true },
+      include: { customer: true, products: true },
     });
 
     return NextResponse.json({

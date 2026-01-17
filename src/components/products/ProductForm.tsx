@@ -20,16 +20,14 @@ import {
 } from "@/lib/validations/product.schema";
 import { getTodayLocalISODate } from "@/lib/utils/date";
 import { useSales } from "@/contexts/sale/SaleContext";
-import { useParams } from "next/navigation";
 import { toast } from "sonner";
 
 interface ProductFormProps {
+  saleId?: string;
   onSuccess?: () => void;
 }
 
-function ProductForm({ onSuccess }: ProductFormProps) {
-  const params = useParams();
-  const saleId = Array.isArray(params.id) ? params.id[0] : params.id;
+function ProductForm({ saleId, onSuccess }: ProductFormProps) {
   const { isSubmitting, addProduct } = useSales();
 
   const form = useForm<CreateProductData>({
