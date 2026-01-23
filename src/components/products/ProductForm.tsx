@@ -52,7 +52,6 @@ function ProductForm({ saleId, onSuccess }: ProductFormProps) {
   const subtotal = unitPrice * quantity;
 
   const onSubmit = async (data: CreateProductData) => {
-    console.log("submitting", data);
     const newProduct = await addProduct(data);
     if (newProduct) {
       toast.success("Se agregó un producto a la venta");

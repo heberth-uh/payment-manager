@@ -15,8 +15,8 @@ function Header() {
     const { error } = await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          toast.success("Signed out successfully");
           router.push("/login");
+          toast.success("Signed out successfully");
         },
       },
     });

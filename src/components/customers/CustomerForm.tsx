@@ -52,7 +52,7 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
     if (isEditing && customerId) {
       getCustomer(customerId);
     }
-  }, [isEditing, customerId]);
+  }, [isEditing, customerId, getCustomer]);
 
   // Reset form with customer data when is fetched
   useEffect(() => {

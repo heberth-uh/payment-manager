@@ -80,30 +80,44 @@ function SalePage() {
               <SideSheet
                 title="Crear producto"
                 description="Descripción opcional"
-                content={(closeSheet) => <ProductView mode="create" saleId={saleId} onSuccess={closeSheet}/>}
+                content={(closeSheet) => (
+                  <ProductView
+                    mode="create"
+                    saleId={saleId}
+                    onSuccess={closeSheet}
+                  />
+                )}
               >
                 <Button variant="default" size="sm">
                   + Nuevo
-                </Button>                
+                </Button>
               </SideSheet>
             </div>
             <div className="mt-2 space-y-2">
               {sale.products.map((product) => (
-                <div
+                <SideSheet
                   key={product.id}
-                  className="flex justify-between items-center bg-gray-50 border rounded-sm p-2"
-                >
-                  <div className="w-4/5 space-y-1">
-                    <p className="text-sm line-clamp-1">{product.name}</p>
-                    <div className="flex justify-between items-center text-xs italic">
-                      <p>{product.saleDate.toLocaleString()}</p>
+                  title={"Detalles del artículo"}
+                  showFooter={true}
+                  content={() => <ProductView saleId={saleId} product={product} />}
+                  >
+                  <div
+                    className="flex justify-between items-center bg-gray-50 border rounded-sm p-2 cursor-pointer"
+                  >
+                    <div className="w-4/5 space-y-1">
+                      <p className="text-sm line-clamp-1">{product.name}</p>
+                      <div className="flex justify-between items-center text-xs italic">
+                        <p>{product.saleDate.toLocaleString()}</p>
+                      </div>
+                    </div>
+                    <div className="w-1/5 text-right">
+                      <p className="font-semibold text-sm">
+                        ${product.subtotal}
+                      </p>
+                      <p className="text-xs">&times;{product.quantity}</p>
                     </div>
                   </div>
-                  <div className="w-1/5 text-right">
-                    <p className="font-semibold text-sm">${product.subtotal}</p>
-                    <p className="text-xs">&times;{product.quantity}</p>
-                  </div>
-                </div>
+                </SideSheet>
               ))}
             </div>
           </>
@@ -113,14 +127,21 @@ function SalePage() {
             <SideSheet
               title="Crear producto"
               description="Descripción opcional"
-              content={(closeSheet) => <ProductView mode="create" saleId={saleId} onSuccess={closeSheet}/>}
+              content={(closeSheet) => (
+                <ProductView
+                  mode="create"
+                  saleId={saleId}
+                  onSuccess={closeSheet}
+                />
+              )}
             >
               <Button variant="default" size="sm">
-                 + Nuevo
+                + Nuevo
               </Button>
             </SideSheet>
           </div>
-        )}      </div>
+        )}
+      </div>
 
       <div>
         <Label>Notas</Label>
