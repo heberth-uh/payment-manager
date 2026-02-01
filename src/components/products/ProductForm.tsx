@@ -24,10 +24,12 @@ import { toast } from "sonner";
 
 interface ProductFormProps {
   saleId?: string;
-  onSuccess?: () => void;
+  isEditing?: boolean;
+  onClose?: () => void;
+  onCancel?: () => void;
 }
 
-function ProductForm({ saleId, onSuccess }: ProductFormProps) {
+function ProductForm({ saleId, isEditing, onClose, onCancel }: ProductFormProps) {
   const { isSubmitting, addProduct } = useSales();
 
   const form = useForm<CreateProductData>({
@@ -56,15 +58,17 @@ function ProductForm({ saleId, onSuccess }: ProductFormProps) {
     if (newProduct) {
       toast.success("Se agregó un producto a la venta");
       form.reset();
-      onSuccess?.();
+      onClose?.();
     } else {
       toast.error("No se pudo agregar el producto");
     }
   };
 
-  const onCancel = () => {
-    form.reset();
-    onSuccess?.();
+  const handleOnCancel = () => {
+    if (!isEditing) {
+      form.reset();
+    }
+    onCancel?.();
   };
 
   return (
@@ -232,11 +236,12 @@ function ProductForm({ saleId, onSuccess }: ProductFormProps) {
           <Button
             type="button"
             variant="secondary"
-            onClick={onCancel}
+            onClick={handleOnCancel}
             className="grow"
           >
             Cancelar
-          </Button> {/* TODO: Add a confirmation dialog */}
+          </Button>{" "}
+          {/* TODO: Add a confirmation dialog */}
           <Button type="submit" className="grow">
             Guardar
           </Button>

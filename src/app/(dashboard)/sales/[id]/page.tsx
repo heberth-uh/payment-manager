@@ -84,7 +84,7 @@ function SalePage() {
                   <ProductView
                     mode="create"
                     saleId={saleId}
-                    onSuccess={closeSheet}
+                    closeSheet={closeSheet}
                   />
                 )}
               >
@@ -98,8 +98,7 @@ function SalePage() {
                 <SideSheet
                   key={product.id}
                   title={"Detalles del artículo"}
-                  showFooter={true}
-                  content={() => <ProductView saleId={saleId} product={product} />}
+                  content={(closeSheet) => <ProductView saleId={saleId} product={product} closeSheet={closeSheet} />}
                   >
                   <div
                     className="flex justify-between items-center bg-gray-50 border rounded-sm p-2 cursor-pointer"
@@ -131,7 +130,7 @@ function SalePage() {
                 <ProductView
                   mode="create"
                   saleId={saleId}
-                  onSuccess={closeSheet}
+                  closeSheet={closeSheet}
                 />
               )}
             >
