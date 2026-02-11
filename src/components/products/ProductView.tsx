@@ -22,18 +22,26 @@ function ProductView({
     setActiveMode(initialMode);
   }, [initialMode]);
 
-  const handleEdit = () => setActiveMode("edit");
-  const handleCancelEdit = () => setActiveMode("view");
+  const openEdit = () => setActiveMode("edit");
+  const openView = () => setActiveMode("view");
 
   // Create mode
   if (activeMode === "create") {
-    return <ProductForm saleId={saleId} onCancel={closeSheet} onClose={closeSheet} />;
+    return (
+      <ProductForm saleId={saleId} onCancel={closeSheet} onClose={closeSheet} />
+    );
   }
 
   // Edit mode
   if (activeMode === "edit") {
     return (
-      <ProductForm saleId={saleId} onCancel={handleCancelEdit} isEditing />
+      <ProductForm
+        saleId={saleId}
+        product={product}
+        onCancel={openView}
+        onClose={openView}
+        isEditing
+      />
     );
   }
 
@@ -45,7 +53,7 @@ function ProductView({
   }
 
   // View mode (default)
-  return <ProductDetails product={product} onEdit={handleEdit} />;
+  return <ProductDetails product={product} onEdit={openEdit} />;
 }
 
 export default ProductView;

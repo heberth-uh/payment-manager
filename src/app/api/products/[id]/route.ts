@@ -1,13 +1,14 @@
 import { getServerSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
+import { parseLocalDate } from "@/lib/utils/date";
 import { UpdateProductSchema } from "@/lib/validations/product.schema";
 import { NextRequest, NextResponse } from "next/server";
 
 // Get a product
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -24,13 +25,13 @@ export async function GET(
     if (!product) {
       return NextResponse.json(
         { message: "Producto no encontrado" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     return NextResponse.json(
       { message: "Product retrieved successfully", data: product },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return handleApiError(error);
@@ -40,7 +41,7 @@ export async function GET(
 // Edit a product
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -66,7 +67,7 @@ export async function PUT(
     if (!existing) {
       return NextResponse.json(
         { message: "Producto no encontrado" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -75,13 +76,27 @@ export async function PUT(
     const purchasePrice = data.purchasePrice ?? existing.purchasePrice;
     const quantity = data.quantity ?? existing.quantity;
 
-    const subtotal = unitPrice * quantity;
-    const profit = (unitPrice - purchasePrice) * quantity;
+    // Build calculated fields object
+    const calculatedFields = {
+      subtotal: unitPrice * quantity,
+      profit: (unitPrice - purchasePrice) * quantity,
+    };
+
+    // Build update data object
+    const updateData: any = {
+      ...data,
+      ...calculatedFields,
+    };
+
+    // Only parse saleDate if it comes in the request
+    if (data.saleDate !== undefined) {
+      updateData.saleDate = parseLocalDate(data.saleDate);
+    }
 
     // Update product
     const result = await prisma.product.update({
       where: { id, userId: session.user.id },
-      data: { ...data, subtotal, profit },
+      data: updateData,
     });
 
     return NextResponse.json({
@@ -96,7 +111,7 @@ export async function PUT(
 // Delete a product
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;

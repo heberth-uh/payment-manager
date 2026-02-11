@@ -98,11 +98,15 @@ function SalePage() {
                 <SideSheet
                   key={product.id}
                   title={"Detalles del artículo"}
-                  content={(closeSheet) => <ProductView saleId={saleId} product={product} closeSheet={closeSheet} />}
-                  >
-                  <div
-                    className="flex justify-between items-center bg-gray-50 border rounded-sm p-2 cursor-pointer"
-                  >
+                  content={(closeSheet) => (
+                    <ProductView
+                      saleId={saleId}
+                      product={product}
+                      closeSheet={closeSheet}
+                    />
+                  )}
+                >
+                  <div className="flex justify-between items-center bg-gray-50 border rounded-sm p-2 cursor-pointer">
                     <div className="w-4/5 space-y-1">
                       <p className="text-sm line-clamp-1">{product.name}</p>
                       <div className="flex justify-between items-center text-xs italic">
@@ -147,7 +151,7 @@ function SalePage() {
         <p className="italic text-gray-500">{sale?.notes || "No hay notas"}</p>
       </div>
 
-      <div className="mt-6 flex justify-end items-center gap-2">
+      <div className="my-6 flex justify-end items-center gap-2">
         <ConfirmaDialog
           title="Eliminar venta"
           description={dialogDescription}

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm, Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -17,20 +17,29 @@ import { Button } from "../ui/button";
 import {
   CreateProductData,
   CreateProductSchema,
+  UpdateProductData,
 } from "@/lib/validations/product.schema";
-import { getTodayLocalISODate } from "@/lib/utils/date";
+import { extractDateOnly, getTodayLocalISODate } from "@/lib/utils/date";
 import { useSales } from "@/contexts/sale/SaleContext";
 import { toast } from "sonner";
+import { Product } from "@/generated/prisma/client";
 
 interface ProductFormProps {
   saleId?: string;
   isEditing?: boolean;
+  product?: Product;
   onClose?: () => void;
   onCancel?: () => void;
 }
 
-function ProductForm({ saleId, isEditing, onClose, onCancel }: ProductFormProps) {
-  const { isSubmitting, addProduct } = useSales();
+function ProductForm({
+  saleId,
+  isEditing,
+  product,
+  onClose,
+  onCancel,
+}: ProductFormProps) {
+  const { isSubmitting, addProduct, updateProduct, error } = useSales();
 
   const form = useForm<CreateProductData>({
     resolver: zodResolver(CreateProductSchema) as Resolver<CreateProductData>,
@@ -53,14 +62,58 @@ function ProductForm({ saleId, isEditing, onClose, onCancel }: ProductFormProps)
   const totalProfit = unitProfit * quantity;
   const subtotal = unitPrice * quantity;
 
+  // Reset form with product data
+  useEffect(() => {
+    if (isEditing) {
+      if (!product) {
+        toast.error("Ocurrió un error al cargar el artículo que desea editar");
+        onClose?.();
+        return;
+      }
+      if (!form.formState.isDirty) {
+        form.reset({
+          name: product.name || "",
+          url: product.url || "",
+          note: product.note || "",
+          saleDate: extractDateOnly(product.saleDate || new Date()),
+          purchasePrice: product.purchasePrice || 0,
+          unitPrice: product.unitPrice || 0,
+          quantity: product.quantity || 1,
+          saleId: saleId || "",
+        });
+      }
+    }
+  }, [isEditing]);
+
   const onSubmit = async (data: CreateProductData) => {
-    const newProduct = await addProduct(data);
-    if (newProduct) {
-      toast.success("Se agregó un producto a la venta");
-      form.reset();
-      onClose?.();
+    if (isEditing && product) {
+      if (!form.formState.isDirty) {
+        onClose?.();
+        return;
+      }
+      // Get only the fields that were changed by the user
+      const { dirtyFields } = form.formState;
+      const changedData = Object.fromEntries(
+        (Object.keys(data) as (keyof UpdateProductData)[])
+          .filter((key) => dirtyFields[key])
+          .map((key) => [key, data[key]]),
+      );
+      const result = await updateProduct(product.id, changedData);
+      if (result) {
+        toast.success("Producto actualizado con éxito");
+        onClose?.();
+      } else {
+        toast.error(error || "Ocurrió un error al actualizar el producto");
+      }
     } else {
-      toast.error("No se pudo agregar el producto");
+      const newProduct = await addProduct(data);
+      if (newProduct) {
+        toast.success("Se agregó un producto a la venta");
+        form.reset();
+        onClose?.();
+      } else {
+        toast.error("No se pudo agregar el producto");
+      }
     }
   };
 

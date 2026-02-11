@@ -1,5 +1,8 @@
 import { Prisma, Product } from "@/generated/prisma/client";
-import { CreateProductData } from "@/lib/validations/product.schema";
+import {
+  CreateProductData,
+  UpdateProductData,
+} from "@/lib/validations/product.schema";
 import { CreateSaleData, UpdateSaleData } from "@/lib/validations/sale.schema";
 
 export type SaleWithRelations = Prisma.SaleGetPayload<{
@@ -17,8 +20,9 @@ export interface SaleContextType {
   createSale: (data: CreateSaleData) => Promise<SaleWithRelations | null>;
   updateSale: (
     saleId: string,
-    data: UpdateSaleData
+    data: UpdateSaleData,
   ) => Promise<SaleWithRelations | null>;
   deleteSale: (saleId: string) => Promise<boolean>;
   addProduct: (data: CreateProductData) => Promise<Product | null>;
+  updateProduct: (productId: string,data: UpdateProductData) => Promise<Product | null>;
 }

@@ -1,6 +1,7 @@
 import { getServerSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
+import { parseLocalDate } from "@/lib/utils/date";
 import { CreateProductSchema } from "@/lib/validations/product.schema";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest) {
     const result = await prisma.product.create({
       data: {
         ...data,
-        saleDate: new Date(data.saleDate),
+        saleDate: parseLocalDate(data.saleDate),
         subtotal: data.unitPrice * data.quantity,
         profit: (data.unitPrice - data.purchasePrice) * data.quantity,
         userId: session.user.id,
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(
       { message: "Product created successfully", data: result },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     return handleApiError(error);
