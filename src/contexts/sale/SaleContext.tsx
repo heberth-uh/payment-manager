@@ -167,6 +167,25 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
   };
 
   // REMOVE A PRODUCT FROM A SALE
+  const deleteProduct = async (productId: string): Promise<boolean> => { 
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      const success = await productsApi.delete(productId);
+      if (success && sale) {
+        setSale({
+          ...sale,
+          products: sale.products?.filter((p) => p.id !== productId) || [],
+        });
+      }
+      return success;
+    } catch (error) {
+      setError(handleClientError(error));
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Auto fetch sales on mount
   useEffect(() => {
@@ -188,6 +207,7 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
         deleteSale,
         addProduct,
         updateProduct,
+        deleteProduct,
       }}
     >
       {children}

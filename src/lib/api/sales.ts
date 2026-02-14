@@ -42,7 +42,7 @@ export const salesApi = {
   // UPDATE
   async update(
     saleId: string,
-    data: UpdateSaleData
+    data: UpdateSaleData,
   ): Promise<SaleWithRelations> {
     const response = await fetch(`/api/sales/${saleId}`, {
       method: "PUT",

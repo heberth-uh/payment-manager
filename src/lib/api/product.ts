@@ -34,4 +34,16 @@ export const productsApi = {
     const result = await response.json();
     return result.data;
   },
+
+  // DELETE
+  async delete(productId: string): Promise<boolean> {
+    const response = await fetch(`/api/products/${productId}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Error al eliminar producto");
+    }
+    return true;
+  },
 };

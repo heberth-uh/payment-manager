@@ -24,5 +24,9 @@ export interface SaleContextType {
   ) => Promise<SaleWithRelations | null>;
   deleteSale: (saleId: string) => Promise<boolean>;
   addProduct: (data: CreateProductData) => Promise<Product | null>;
-  updateProduct: (productId: string,data: UpdateProductData) => Promise<Product | null>;
+  updateProduct: (
+    productId: string,
+    data: UpdateProductData,
+  ) => Promise<Product | null>;
+  deleteProduct: (productId: string) => Promise<boolean>;
 }
