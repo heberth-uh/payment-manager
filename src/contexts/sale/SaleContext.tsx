@@ -9,7 +9,7 @@ import {
   CreateProductData,
   UpdateProductData,
 } from "@/lib/validations/product.schema";
-import { productsApi } from "@/lib/api/product";
+import { productsApi } from "@/lib/api/products";
 import { Product } from "@/generated/prisma/client";
 
 const SaleContext = createContext<SaleContextType | null>(null);

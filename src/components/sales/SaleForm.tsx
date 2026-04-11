@@ -21,11 +21,14 @@ import CustomerCombobox from "../customers/CustomerCombobox";
 import { useSales } from "@/contexts/sale/SaleContext";
 import { toast } from "sonner";
 import { useParams, useRouter } from "next/navigation";
+import ProductListSection from "../products/ProductListSection";
+import { useProductDraft } from "@/contexts/product/ProductDraftContext";
 
 function SaleForm({ isEditing = false }: { isEditing?: boolean }) {
   const router = useRouter();
   const params = useParams();
   const saleId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const { drafts } = useProductDraft();
   const {
     sale,
     isFetching,
@@ -37,10 +40,12 @@ function SaleForm({ isEditing = false }: { isEditing?: boolean }) {
   } = useSales();
 
   const form = useForm<CreateSaleData>({
+    // TODO: Must use form sale data (new types?), check product zod shcema as reference
     resolver: zodResolver(CreateSaleSchema),
     defaultValues: {
       customerId: "",
       notes: "",
+      products: [], // TODO: Add sale?.products and fix types errors
     },
   });
 
@@ -75,7 +80,8 @@ function SaleForm({ isEditing = false }: { isEditing?: boolean }) {
         toast.error(error || "Error al actualizar la venta");
       }
     } else {
-      const newSale = await createSale(data);
+      const saleData = { ...data, products: drafts };
+      const newSale = await createSale(saleData);
       if (newSale) {
         toast.success("Nueva venta creada");
         form.reset();
@@ -109,6 +115,11 @@ function SaleForm({ isEditing = false }: { isEditing?: boolean }) {
             )}
           />
         </div>
+        <ProductListSection
+          products={!isEditing ? drafts : sale?.products || []}
+          saleId={saleId}
+          isDraftMode={!isEditing}
+        />
         <div className="grid gap-6">
           <FormField
             control={form.control}

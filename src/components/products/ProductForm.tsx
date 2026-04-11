@@ -15,19 +15,22 @@ import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import {
+  ProductFormData,
+  ProductFormSchema,
   CreateProductData,
-  CreateProductSchema,
-  UpdateProductData,
 } from "@/lib/validations/product.schema";
 import { extractDateOnly, getTodayLocalISODate } from "@/lib/utils/date";
 import { useSales } from "@/contexts/sale/SaleContext";
 import { toast } from "sonner";
-import { Product } from "@/generated/prisma/client";
+import { ProductOrDraft } from "./types";
+import { useProductDraft } from "@/contexts/product/ProductDraftContext";
+import { getDirtyFields, handleNumberInputChange } from "@/lib/utils/form";
 
 interface ProductFormProps {
   saleId?: string;
   isEditing?: boolean;
-  product?: Product;
+  product?: ProductOrDraft;
+  isDraftMode?: boolean;
   onClose?: () => void;
   onCancel?: () => void;
 }
@@ -36,13 +39,15 @@ function ProductForm({
   saleId,
   isEditing,
   product,
+  isDraftMode = false,
   onClose,
   onCancel,
 }: ProductFormProps) {
-  const { isSubmitting, addProduct, updateProduct, error } = useSales();
+  const { addProduct, updateProduct, error } = useSales();
+  const { addProductDraft } = useProductDraft();
 
-  const form = useForm<CreateProductData>({
-    resolver: zodResolver(CreateProductSchema) as Resolver<CreateProductData>,
+  const form = useForm<ProductFormData>({
+    resolver: zodResolver(ProductFormSchema) as Resolver<ProductFormData>,
     defaultValues: {
       name: "",
       url: "",
@@ -51,10 +56,10 @@ function ProductForm({
       purchasePrice: 0,
       unitPrice: 0,
       quantity: 1,
-      saleId: saleId || "",
     },
   });
 
+  // Calculate profit and subtotal for real-time display
   const unitPrice = form.watch("unitPrice") || 0;
   const purchasePrice = form.watch("purchasePrice") || 0;
   const quantity = form.watch("quantity") || 1;
@@ -79,25 +84,19 @@ function ProductForm({
           purchasePrice: product.purchasePrice || 0,
           unitPrice: product.unitPrice || 0,
           quantity: product.quantity || 1,
-          saleId: saleId || "",
         });
       }
     }
-  }, [isEditing]);
+  }, [isEditing, product, form, onClose]);
 
-  const onSubmit = async (data: CreateProductData) => {
+  const onSubmit = async (data: ProductFormData) => {
+    // Edit mode: Update existing product, only send changed fields
     if (isEditing && product) {
       if (!form.formState.isDirty) {
         onClose?.();
         return;
       }
-      // Get only the fields that were changed by the user
-      const { dirtyFields } = form.formState;
-      const changedData = Object.fromEntries(
-        (Object.keys(data) as (keyof UpdateProductData)[])
-          .filter((key) => dirtyFields[key])
-          .map((key) => [key, data[key]]),
-      );
+      const changedData = getDirtyFields(form, data);
       const result = await updateProduct(product.id, changedData);
       if (result) {
         toast.success("Producto actualizado con éxito");
@@ -105,8 +104,14 @@ function ProductForm({
       } else {
         toast.error(error || "Ocurrió un error al actualizar el producto");
       }
+      // Create mode: Add new product to an existing sale
     } else {
-      const newProduct = await addProduct(data);
+      let newProduct = null;
+      const draftData: CreateProductData = {
+        ...data,
+        saleId: saleId || "",
+      };
+      newProduct = await addProduct(draftData);
       if (newProduct) {
         toast.success("Se agregó un producto a la venta");
         form.reset();
@@ -116,6 +121,16 @@ function ProductForm({
       }
     }
   };
+
+  /*
+    Create/Edit product draft. This function is triggered only in draft mode
+    Handles "Guardar" button by onclick to save product in the draft context
+   */
+  const handleSave = form.handleSubmit((data) => {
+    addProductDraft(data);
+    form.reset();
+    onClose?.();
+  });
 
   const handleOnCancel = () => {
     if (!isEditing) {
@@ -141,7 +156,7 @@ function ProductForm({
                   <Input
                     placeholder="Nombre del producto*"
                     {...field}
-                    disabled={isSubmitting || form.formState.isSubmitting}
+                    disabled={form.formState.isSubmitting}
                   />
                 </FormControl>
                 <FormMessage />
@@ -161,7 +176,8 @@ function ProductForm({
                       step="0.01"
                       placeholder="0.00"
                       {...field}
-                      disabled={isSubmitting || form.formState.isSubmitting}
+                      disabled={form.formState.isSubmitting}
+                      onChange={handleNumberInputChange(field.onChange)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -180,7 +196,8 @@ function ProductForm({
                       step="0.01"
                       placeholder="0.00"
                       {...field}
-                      disabled={isSubmitting || form.formState.isSubmitting}
+                      disabled={form.formState.isSubmitting}
+                      onChange={handleNumberInputChange(field.onChange)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -221,7 +238,8 @@ function ProductForm({
                     <Input
                       type="number"
                       {...field}
-                      disabled={isSubmitting || form.formState.isSubmitting}
+                      disabled={form.formState.isSubmitting}
+                      onChange={handleNumberInputChange(field.onChange)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -238,7 +256,7 @@ function ProductForm({
                     <Input
                       type="date"
                       {...field}
-                      disabled={isSubmitting || form.formState.isSubmitting}
+                      disabled={form.formState.isSubmitting}
                     />
                   </FormControl>
                   <FormMessage />
@@ -260,7 +278,7 @@ function ProductForm({
                   <Input
                     placeholder="Link de Shein/Amazon"
                     {...field}
-                    disabled={isSubmitting || form.formState.isSubmitting}
+                    disabled={form.formState.isSubmitting}
                   />
                 </FormControl>
                 <FormMessage />
@@ -277,7 +295,7 @@ function ProductForm({
                   <Textarea
                     placeholder="Comentarios adicionales del producto"
                     {...field}
-                    disabled={isSubmitting || form.formState.isSubmitting}
+                    disabled={form.formState.isSubmitting}
                   />
                 </FormControl>
                 <FormMessage />
@@ -291,12 +309,18 @@ function ProductForm({
             variant="secondary"
             onClick={handleOnCancel}
             className="grow"
+            disabled={form.formState.isSubmitting}
           >
             Cancelar
+            {/* TODO: Add a confirmation dialog */}
           </Button>{" "}
-          {/* TODO: Add a confirmation dialog */}
-          <Button type="submit" className="grow">
-            Guardar
+          <Button
+            type={isDraftMode ? "button" : "submit"}
+            className="grow"
+            onClick={isDraftMode ? handleSave : undefined}
+            disabled={form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting ? "Guardando" : "Guardar"}
           </Button>
         </div>
       </form>

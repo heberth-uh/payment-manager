@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import ProductForm from "./ProductForm";
-import { Product } from "@/generated/prisma/client";
 import ProductDetails from "./ProductDetails";
+import { ProductOrDraft } from "./types";
 
 interface ProductViewProps {
   mode?: "view" | "create" | "edit";
-  saleId: string;
-  product?: Product;
+  saleId?: string;
+  product?: ProductOrDraft;
+  isDraftMode?: boolean;
   closeSheet?: () => void;
 }
 
@@ -14,6 +15,7 @@ function ProductView({
   mode: initialMode = "view",
   saleId,
   product,
+  isDraftMode = false,
   closeSheet,
 }: ProductViewProps) {
   const [activeMode, setActiveMode] = useState(initialMode);
@@ -22,13 +24,19 @@ function ProductView({
     setActiveMode(initialMode);
   }, [initialMode]);
 
+  // Handlers to switch between modes
   const openEdit = () => setActiveMode("edit");
   const openView = () => setActiveMode("view");
 
   // Create mode
   if (activeMode === "create") {
     return (
-      <ProductForm saleId={saleId} onCancel={closeSheet} onClose={closeSheet} />
+      <ProductForm
+        saleId={saleId}
+        isDraftMode={isDraftMode}
+        onCancel={closeSheet}
+        onClose={closeSheet}
+      />
     );
   }
 
@@ -38,6 +46,7 @@ function ProductView({
       <ProductForm
         saleId={saleId}
         product={product}
+        isDraftMode={isDraftMode}
         onCancel={openView}
         onClose={openView}
         isEditing
@@ -53,7 +62,13 @@ function ProductView({
   }
 
   // View mode (default)
-  return <ProductDetails product={product} onEdit={openEdit} />;
+  return (
+    <ProductDetails
+      product={product}
+      isDraftMode={isDraftMode}
+      onEdit={openEdit}
+    />
+  );
 }
 
 export default ProductView;

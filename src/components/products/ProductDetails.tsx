@@ -9,13 +9,15 @@ import ConfirmaDialog from "../ui/ConfirmaDialog";
 import { useSales } from "@/contexts/sale/SaleContext";
 import { toast } from "sonner";
 import { extractDateOnly } from "@/lib/utils/date";
+import { ProductOrDraft } from "./types";
 
 interface ProductDetailsProps {
-  product: Product;
+  product: ProductOrDraft;
   onEdit?: () => void;
+  isDraftMode?: boolean;
 }
 
-function ProductDetails({ product, onEdit }: ProductDetailsProps) {
+function ProductDetails({ product, onEdit, isDraftMode = false }: ProductDetailsProps) {
   const { deleteProduct, isSubmitting } = useSales();
   const profitPerUnit = product.unitPrice - product.purchasePrice;
   const marginPercent =
@@ -25,6 +27,15 @@ function ProductDetails({ product, onEdit }: ProductDetailsProps) {
   const totalCost = product.purchasePrice * product.quantity;
 
   const handleDelete = async () => {
+    if (isDraftMode) {
+      // TODO: Add logic to remove draft by the proper function
+      toast.info("Draft removal not yet implemented");
+      return;
+    }
+    if (!product.id) {
+      toast.error("Cannot delete product without an ID");
+      return;
+    }
     const success = await deleteProduct(product.id);
     if (!success) {
       toast.error("Ocurrió un error al eliminar este artículo");
@@ -32,7 +43,6 @@ function ProductDetails({ product, onEdit }: ProductDetailsProps) {
     }
     toast.success("Artículo eliminado");
   };
-
   return (
     <div className="px-4 flex flex-col gap-6 text-sm mb-4 overflow-hidden">
       {onEdit && (

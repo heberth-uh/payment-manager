@@ -51,8 +51,18 @@ export async function PUT(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    // Valitate the requeste body
-    const data = UpdateSaleSchema.parse(body);
+    // Validate the request body
+    const parsed = UpdateSaleSchema.parse(body);
+
+    const { products: _products, ...data } = parsed;
+    // TODO: Implement product sync when editing a sale.
+    // Strategy: compare incoming _products[] against current DB products for this sale:
+    //   - No id → create (prisma.product.create)
+    //   - Has id + in DB → update only dirty fields (prisma.product.update)
+    //   - In DB but missing from _products → delete (prisma.product.deleteMany)
+    // Wrap all operations in prisma.$transaction([...]) for atomicity.
+    // Requires updating UpdateSaleSchema to enforce product shape (id optional, required fields present).
+
     const result = await prisma.sale.update({
       where: { id, userId: session.user.id },
       data,

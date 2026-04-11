@@ -2,7 +2,8 @@ import { Product } from "@/generated/prisma/client";
 import {
   CreateProductData,
   UpdateProductData,
-} from "../validations/product.schema";
+} from "@/lib/validations/product.schema";
+import { extractErrorMessage } from "@/lib/utils/client-error";
 
 export const productsApi = {
   // CREATE
@@ -13,8 +14,11 @@ export const productsApi = {
       body: JSON.stringify(data),
     });
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error al crear producto");
+      const message = await extractErrorMessage(
+        response,
+        "Error al crear producto",
+      );
+      throw new Error(message);
     }
     const result = await response.json();
     return result.data;
@@ -28,8 +32,11 @@ export const productsApi = {
       body: JSON.stringify(data),
     });
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error al actualizar producto");
+      const message = await extractErrorMessage(
+        response,
+        "Error al actualizarproducto",
+      );
+      throw new Error(message);
     }
     const result = await response.json();
     return result.data;
@@ -41,8 +48,11 @@ export const productsApi = {
       method: "DELETE",
     });
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error al eliminar producto");
+      const message = await extractErrorMessage(
+        response,
+        "Error al eliminar producto",
+      );
+      throw new Error(message);
     }
     return true;
   },

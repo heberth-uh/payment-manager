@@ -1,13 +1,17 @@
 import { SaleWithRelations } from "@/contexts/sale/sale.types";
-import { CreateSaleData, UpdateSaleData } from "../validations/sale.schema";
+import { CreateSaleData, UpdateSaleData } from "@/lib/validations/sale.schema";
+import { extractErrorMessage } from "@/lib/utils/client-error";
 
 export const salesApi = {
   // GET ALL
   async getAll(): Promise<SaleWithRelations[]> {
     const response = await fetch("/api/sales");
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error al obtener ventas");
+      const message = await extractErrorMessage(
+        response,
+        "Error al obtener ventas",
+      );
+      throw new Error(message);
     }
     const result = await response.json();
     return result.data;
@@ -17,8 +21,11 @@ export const salesApi = {
   async getById(saleId: string): Promise<SaleWithRelations> {
     const response = await fetch(`/api/sales/${saleId}`);
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error al obtener venta");
+      const message = await extractErrorMessage(
+        response,
+        "Error al obtener venta",
+      );
+      throw new Error(message);
     }
     const result = await response.json();
     return result.data;
@@ -32,8 +39,11 @@ export const salesApi = {
       body: JSON.stringify(data),
     });
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error al crear venta");
+      const message = await extractErrorMessage(
+        response,
+        "Error al crear venta",
+      );
+      throw new Error(message);
     }
     const result = await response.json();
     return result.data;
@@ -50,8 +60,11 @@ export const salesApi = {
       body: JSON.stringify(data),
     });
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.meessage || "Error al actualizar venta");
+      const message = await extractErrorMessage(
+        response,
+        "Error al actualizar venta",
+      );
+      throw new Error(message);
     }
     const result = await response.json();
     return result.data;
@@ -63,8 +76,11 @@ export const salesApi = {
       method: "DELETE",
     });
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error al eliminar venta");
+      const message = await extractErrorMessage(
+        response,
+        "Error al eliminar venta",
+      );
+      throw new Error(message);
     }
     return true;
   },
