@@ -10,6 +10,7 @@ import { useSales } from "@/contexts/sale/SaleContext";
 import { toast } from "sonner";
 import { extractDateOnly } from "@/lib/utils/date";
 import { ProductOrDraft } from "./types";
+import { useProductDraft } from "@/contexts/product/ProductDraftContext";
 
 interface ProductDetailsProps {
   product: ProductOrDraft;
@@ -19,6 +20,7 @@ interface ProductDetailsProps {
 
 function ProductDetails({ product, onEdit, isDraftMode = false }: ProductDetailsProps) {
   const { deleteProduct, isSubmitting } = useSales();
+  const { deleteProductDraft } = useProductDraft();
   const profitPerUnit = product.unitPrice - product.purchasePrice;
   const marginPercent =
     product.purchasePrice > 0
@@ -27,19 +29,18 @@ function ProductDetails({ product, onEdit, isDraftMode = false }: ProductDetails
   const totalCost = product.purchasePrice * product.quantity;
 
   const handleDelete = async () => {
-    if (isDraftMode) {
-      // TODO: Add logic to remove draft by the proper function
-      toast.info("Draft removal not yet implemented");
-      return;
-    }
     if (!product.id) {
-      toast.error("Cannot delete product without an ID");
+      toast.error("Ocurrió un problema al encontrar el artículo que deseas eliminar");
       return;
     }
-    const success = await deleteProduct(product.id);
-    if (!success) {
-      toast.error("Ocurrió un error al eliminar este artículo");
-      return;
+    if (isDraftMode) {
+      deleteProductDraft(product.id);
+    } else {
+      const success = await deleteProduct(product.id);
+      if (!success) {
+        toast.error("Ocurrió un error al eliminar este artículo");
+        return;
+      }
     }
     toast.success("Artículo eliminado");
   };

@@ -44,7 +44,7 @@ function ProductForm({
   onCancel,
 }: ProductFormProps) {
   const { addProduct, updateProduct, error } = useSales();
-  const { addProductDraft } = useProductDraft();
+  const { addProductDraft, updateProductDraft } = useProductDraft();
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(ProductFormSchema) as Resolver<ProductFormData>,
@@ -127,7 +127,12 @@ function ProductForm({
     Handles "Guardar" button by onclick to save product in the draft context
    */
   const handleSave = form.handleSubmit((data) => {
-    addProductDraft(data);
+    if (isEditing) {
+      if (!product?.id) return;
+      updateProductDraft(product.id, data);
+    } else {
+      addProductDraft(data);
+    }
     form.reset();
     onClose?.();
   });

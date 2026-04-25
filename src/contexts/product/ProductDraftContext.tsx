@@ -2,6 +2,7 @@
 
 import { ProductFormData } from "@/lib/validations/product.schema";
 import { SaleProductData } from "@/lib/validations/sale.schema";
+import { calculateProductTotals } from "@/lib/utils/productTotals";
 import { createContext, useContext, useState } from "react";
 
 /* 
@@ -11,14 +12,16 @@ TODO:
     - ✅ Call drafts in the ProductListSection to show the products in the list
     - Add handlers for drafts context:
       - ✅ to add
-      - update
-      - remove
+      - ✅ update
+      - ✅ remove
     - Add functions to get totals
 */
 
 interface ProductDraftContextType {
   drafts: SaleProductData[];
-  addProductDraft: (product: ProductFormData) => void;
+  addProductDraft: (data: ProductFormData) => void;
+  updateProductDraft: (id: string, data: Partial<SaleProductData>) => void;
+  deleteProductDraft: (id: string) => void;
 }
 
 const ProductDraftContext = createContext<ProductDraftContextType | null>(null);
@@ -30,15 +33,35 @@ export function ProductDraftProvider({
 }) {
   const [drafts, setDrafts] = useState<SaleProductData[]>([]);
 
-  const addProductDraft = (product: ProductFormData) => {
-    const productWithDraftData: SaleProductData = {
-      ...product,
-      id: crypto.randomUUID(),
-      // TODO: Test with deciamns to use Math.round() to avoid floating point issues (e.g., 0.1 * 3 = 0.30000000000000004)
-      subtotal: product.unitPrice * product.quantity,
-      profit: (product.unitPrice - product.purchasePrice) * product.quantity,
-    };
-    setDrafts((prevDrafts) => [...prevDrafts, productWithDraftData]);
+  const addProductDraft = (data: ProductFormData) => {
+    const { subtotal, profit } = calculateProductTotals(
+      data.unitPrice,
+      data.purchasePrice,
+      data.quantity,
+    );
+    setDrafts((prevDrafts) => [
+      ...prevDrafts,
+      { ...data, id: crypto.randomUUID(), subtotal, profit },
+    ]);
+  };
+
+  const updateProductDraft = (id: string, data: Partial<SaleProductData>) => {
+    setDrafts((prevDrafts) =>
+      prevDrafts.map((draft) => {
+        if (draft.id !== id) return draft;
+        const merged = { ...draft, ...data };
+        const { subtotal, profit } = calculateProductTotals(
+          merged.unitPrice,
+          merged.purchasePrice,
+          merged.quantity,
+        );
+        return { ...merged, subtotal, profit };
+      }),
+    );
+  };
+
+  const deleteProductDraft = (id: string) => {
+    setDrafts((prevDrafts) => prevDrafts.filter((draft) => draft.id !== id));
   };
 
   return (
@@ -46,6 +69,8 @@ export function ProductDraftProvider({
       value={{
         drafts,
         addProductDraft,
+        updateProductDraft,
+        deleteProductDraft,
       }}
     >
       {children}
