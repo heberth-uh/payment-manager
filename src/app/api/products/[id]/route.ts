@@ -2,6 +2,7 @@ import { getServerSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
 import { parseLocalDate } from "@/lib/utils/date";
+import { calculateProductTotals } from "@/lib/utils/productTotals";
 import { UpdateProductSchema } from "@/lib/validations/product.schema";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -77,21 +78,18 @@ export async function PUT(
     const quantity = data.quantity ?? existing.quantity;
 
     // Build calculated fields object
-    const calculatedFields = {
-      subtotal: unitPrice * quantity,
-      profit: (unitPrice - purchasePrice) * quantity,
-    };
+    const { storedTotals } = calculateProductTotals(
+      unitPrice,
+      purchasePrice,
+      quantity,
+    );
 
     // Build update data object
-    const updateData: any = {
+    const updateData = {
       ...data,
-      ...calculatedFields,
+      ...storedTotals,
+      ...(data.saleDate !== undefined && { saleDate: parseLocalDate(data.saleDate) }),
     };
-
-    // Only parse saleDate if it comes in the request
-    if (data.saleDate !== undefined) {
-      updateData.saleDate = parseLocalDate(data.saleDate);
-    }
 
     // Update product
     const result = await prisma.product.update({

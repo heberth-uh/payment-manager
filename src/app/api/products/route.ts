@@ -2,6 +2,7 @@ import { getServerSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
 import { parseLocalDate } from "@/lib/utils/date";
+import { calculateProductTotals } from "@/lib/utils/productTotals";
 import { CreateProductSchema } from "@/lib/validations/product.schema";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -40,12 +41,17 @@ export async function POST(request: NextRequest) {
 
     // Validate the request body
     const data = CreateProductSchema.parse(body);
+    // Get calculated fields object
+    const { storedTotals } = calculateProductTotals(
+      data.unitPrice,
+      data.purchasePrice,
+      data.quantity,
+    );
     const result = await prisma.product.create({
       data: {
         ...data,
+        ...storedTotals,
         saleDate: parseLocalDate(data.saleDate),
-        subtotal: data.unitPrice * data.quantity,
-        profit: (data.unitPrice - data.purchasePrice) * data.quantity,
         userId: session.user.id,
       },
     });

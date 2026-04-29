@@ -5,18 +5,6 @@ import { SaleProductData } from "@/lib/validations/sale.schema";
 import { calculateProductTotals } from "@/lib/utils/productTotals";
 import { createContext, useContext, useState } from "react";
 
-/* 
-Basic context is created
-TODO:
-    - ✅ Wrap the SaleForm (/sales/{new|create|[id]}/page.tsx) with the ProductDraftProvider
-    - ✅ Call drafts in the ProductListSection to show the products in the list
-    - Add handlers for drafts context:
-      - ✅ to add
-      - ✅ update
-      - ✅ remove
-    - Add functions to get totals
-*/
-
 interface ProductDraftContextType {
   drafts: SaleProductData[];
   addProductDraft: (data: ProductFormData) => void;
@@ -33,33 +21,36 @@ export function ProductDraftProvider({
 }) {
   const [drafts, setDrafts] = useState<SaleProductData[]>([]);
 
+  // CREATE DRAFT
   const addProductDraft = (data: ProductFormData) => {
-    const { subtotal, profit } = calculateProductTotals(
+    const { storedTotals } = calculateProductTotals(
       data.unitPrice,
       data.purchasePrice,
       data.quantity,
     );
     setDrafts((prevDrafts) => [
       ...prevDrafts,
-      { ...data, id: crypto.randomUUID(), subtotal, profit },
+      { ...data, id: crypto.randomUUID(), ...storedTotals },
     ]);
   };
 
+  // UPDATE DRAFT
   const updateProductDraft = (id: string, data: Partial<SaleProductData>) => {
     setDrafts((prevDrafts) =>
       prevDrafts.map((draft) => {
         if (draft.id !== id) return draft;
         const merged = { ...draft, ...data };
-        const { subtotal, profit } = calculateProductTotals(
+        const { storedTotals } = calculateProductTotals(
           merged.unitPrice,
           merged.purchasePrice,
           merged.quantity,
         );
-        return { ...merged, subtotal, profit };
+        return { ...merged, ...storedTotals };
       }),
     );
   };
 
+  // DELETE DRAFT
   const deleteProductDraft = (id: string) => {
     setDrafts((prevDrafts) => prevDrafts.filter((draft) => draft.id !== id));
   };

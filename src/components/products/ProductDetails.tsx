@@ -1,6 +1,5 @@
 "use client";
 
-import { Product } from "@/generated/prisma/client";
 import { Label } from "@radix-ui/react-label";
 import React from "react";
 import { Button } from "../ui/button";
@@ -11,6 +10,7 @@ import { toast } from "sonner";
 import { extractDateOnly } from "@/lib/utils/date";
 import { ProductOrDraft } from "./types";
 import { useProductDraft } from "@/contexts/product/ProductDraftContext";
+import { calculateProductTotals } from "@/lib/utils/productTotals";
 
 interface ProductDetailsProps {
   product: ProductOrDraft;
@@ -18,19 +18,25 @@ interface ProductDetailsProps {
   isDraftMode?: boolean;
 }
 
-function ProductDetails({ product, onEdit, isDraftMode = false }: ProductDetailsProps) {
+function ProductDetails({
+  product,
+  onEdit,
+  isDraftMode = false,
+}: ProductDetailsProps) {
   const { deleteProduct, isSubmitting } = useSales();
   const { deleteProductDraft } = useProductDraft();
-  const profitPerUnit = product.unitPrice - product.purchasePrice;
-  const marginPercent =
-    product.purchasePrice > 0
-      ? (profitPerUnit / product.purchasePrice) * 100
-      : 0;
-  const totalCost = product.purchasePrice * product.quantity;
+  const { computedMetrics } = calculateProductTotals(
+    product.unitPrice,
+    product.purchasePrice,
+    product.quantity,
+  );
+  const { profitPerUnit, marginPercent, totalCost } = computedMetrics;
 
   const handleDelete = async () => {
     if (!product.id) {
-      toast.error("Ocurrió un problema al encontrar el artículo que deseas eliminar");
+      toast.error(
+        "Ocurrió un problema al encontrar el artículo que deseas eliminar",
+      );
       return;
     }
     if (isDraftMode) {
@@ -57,7 +63,12 @@ function ProductDetails({ product, onEdit, isDraftMode = false }: ProductDetails
             }
             confirmText="Sí, eliminar"
           >
-            <Button type="button" variant="secondary" title="Eliminar" disabled={isSubmitting}>
+            <Button
+              type="button"
+              variant="secondary"
+              title="Eliminar"
+              disabled={isSubmitting}
+            >
               Eliminar
             </Button>
           </ConfirmaDialog>
@@ -69,9 +80,7 @@ function ProductDetails({ product, onEdit, isDraftMode = false }: ProductDetails
           <Label className="uppercase font-bold text-gray-400 tracking-wider">
             Fecha de venta
           </Label>
-          <p>
-            {extractDateOnly(product.saleDate)}
-          </p>
+          <p>{extractDateOnly(product.saleDate)}</p>
         </div>
         <div className="flex flex-col gap-2">
           <Label className="uppercase font-bold text-gray-400 tracking-wider">

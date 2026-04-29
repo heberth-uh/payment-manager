@@ -1,5 +1,27 @@
 import { z } from "zod";
+// FIXME: This method creates the base schema for server, so there will be fields
+// that we don't need in the forms, such as saleId. In this case is better to create the base
+// ONLY for the form, where we define only those fields that we will need there.
+// For those fields that are required in the server but not in the form, we can set them in an
+// extended new schema based on the current form schema. This way we can keep schemas clean between
+// server and client.
+/*
+example:
+// Base: formularios (tipos simples)
+export const ProductFormSchema = z.object({
+  name: z.string(),
+  saleDate: z.string(), // ← Without transformation, because it's only for the form
+  // ... otros campos
+});
 
+// Servidor: extiende con transformaciones
+export const CreateProductSchema = ProductFormSchema.extend({
+  saleDate: z.string().transform(val => new Date(val)), // ← Here we transform the date string to a Date, which is what the server needs.
+  saleId: z.string(),
+});
+
+TODO: Do the same for the the sale schema and TEST all the CRUD from the form to the server
+*/
 export const CreateProductSchema = z.object({
   name: z
     .string("El nombre es requerido")
@@ -19,8 +41,7 @@ export const CreateProductSchema = z.object({
   quantity: z.coerce
     .number("La cantidad es requerida")
     .int("La cantidad debe ser un número entero")
-    .positive("La cantidad debe ser mayor a 0")
-    .default(1),
+    .positive("La cantidad debe ser mayor a 0"),
   saleId: z.string().min(1, "La venta es requerida")
 });
 
