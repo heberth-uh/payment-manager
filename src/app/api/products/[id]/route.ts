@@ -1,7 +1,6 @@
 import { getServerSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
-import { parseLocalDate } from "@/lib/utils/date";
 import { calculateProductTotals } from "@/lib/utils/productTotals";
 import { UpdateProductSchema } from "@/lib/validations/product.schema";
 import { NextRequest, NextResponse } from "next/server";
@@ -88,7 +87,6 @@ export async function PUT(
     const updateData = {
       ...data,
       ...storedTotals,
-      ...(data.saleDate !== undefined && { saleDate: parseLocalDate(data.saleDate) }),
     };
 
     // Update product

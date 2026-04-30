@@ -1,7 +1,7 @@
 import { Prisma, Product } from "@/generated/prisma/client";
 import {
-  CreateProductData,
-  UpdateProductData,
+  CreateProductInput,
+  UpdateProductInput,
 } from "@/lib/validations/product.schema";
 import { CreateSaleData, UpdateSaleData } from "@/lib/validations/sale.schema";
 
@@ -23,10 +23,10 @@ export interface SaleContextType {
     data: UpdateSaleData,
   ) => Promise<SaleWithRelations | null>;
   deleteSale: (saleId: string) => Promise<boolean>;
-  addProduct: (data: CreateProductData) => Promise<Product | null>;
+  addProduct: (data: CreateProductInput) => Promise<Product | null>;
   updateProduct: (
     productId: string,
-    data: UpdateProductData,
+    data: UpdateProductInput,
   ) => Promise<Product | null>;
   deleteProduct: (productId: string) => Promise<boolean>;
 }

@@ -1,13 +1,13 @@
 import { Product } from "@/generated/prisma/client";
 import {
-  CreateProductData,
-  UpdateProductData,
+  CreateProductInput,
+  UpdateProductInput,
 } from "@/lib/validations/product.schema";
 import { extractErrorMessage } from "@/lib/utils/client-error";
 
 export const productsApi = {
   // CREATE
-  async create(data: CreateProductData): Promise<Product> {
+  async create(data: CreateProductInput): Promise<Product> {
     const response = await fetch("/api/products", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -25,7 +25,7 @@ export const productsApi = {
   },
 
   // UPDATE
-  async update(productId: string, data: UpdateProductData): Promise<Product> {
+  async update(productId: string, data: UpdateProductInput): Promise<Product> {
     const response = await fetch(`/api/products/${productId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },

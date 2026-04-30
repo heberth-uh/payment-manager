@@ -35,7 +35,7 @@ export function ProductDraftProvider({
   };
 
   // UPDATE DRAFT
-  const updateProductDraft = (id: string, data: Partial<SaleProductData>) => {
+  const updateProductDraft = (id: string, data: Partial<SaleProductData>) => { // REFACTOR: We need to define this type in the schema file and import it here
     setDrafts((prevDrafts) =>
       prevDrafts.map((draft) => {
         if (draft.id !== id) return draft;

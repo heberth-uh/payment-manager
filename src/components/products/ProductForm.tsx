@@ -17,7 +17,7 @@ import { Button } from "../ui/button";
 import {
   ProductFormData,
   ProductFormSchema,
-  CreateProductData,
+  CreateProductInput,
 } from "@/lib/validations/product.schema";
 import { extractDateOnly, getTodayLocalISODate } from "@/lib/utils/date";
 import { useSales } from "@/contexts/sale/SaleContext";
@@ -107,7 +107,7 @@ function ProductForm({
       // Create mode: Add new product to an existing sale
     } else {
       let newProduct = null;
-      const draftData: CreateProductData = {
+      const draftData: CreateProductInput = {
         ...data,
         saleId: saleId || "",
       };
@@ -149,6 +149,7 @@ function ProductForm({
       <form
         className="flex flex-col h-full"
         onSubmit={form.handleSubmit(onSubmit)}
+        noValidate
       >
         <div className="flex flex-col gap-4 flex-1 overflow-auto px-4 pb-6">
           <FormField
@@ -262,6 +263,8 @@ function ProductForm({
                       type="date"
                       {...field}
                       disabled={form.formState.isSubmitting}
+                      min={`${new Date().getFullYear() - 10}-01-01`}
+                      max={`${new Date().getFullYear()}-12-31`}
                     />
                   </FormControl>
                   <FormMessage />

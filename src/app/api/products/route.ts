@@ -1,7 +1,6 @@
 import { getServerSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
-import { parseLocalDate } from "@/lib/utils/date";
 import { calculateProductTotals } from "@/lib/utils/productTotals";
 import { CreateProductSchema } from "@/lib/validations/product.schema";
 import { NextRequest, NextResponse } from "next/server";
@@ -51,7 +50,6 @@ export async function POST(request: NextRequest) {
       data: {
         ...data,
         ...storedTotals,
-        saleDate: parseLocalDate(data.saleDate),
         userId: session.user.id,
       },
     });

@@ -1,28 +1,16 @@
 import { z } from "zod";
-// FIXME: This method creates the base schema for server, so there will be fields
-// that we don't need in the forms, such as saleId. In this case is better to create the base
-// ONLY for the form, where we define only those fields that we will need there.
-// For those fields that are required in the server but not in the form, we can set them in an
-// extended new schema based on the current form schema. This way we can keep schemas clean between
-// server and client.
-/*
-example:
-// Base: formularios (tipos simples)
+
+const saleDateSchema = z
+  .string()
+  .min(1, "La fecha es requerida")
+  .refine((val) => {
+    const year = new Date(val).getFullYear();
+    const currentYear = new Date().getFullYear();
+    return year >= currentYear - 10 && year <= currentYear;
+  }, `La fecha debe estar entre los últimos 10 años y el año actual`);
+
+// Client schemas
 export const ProductFormSchema = z.object({
-  name: z.string(),
-  saleDate: z.string(), // ← Without transformation, because it's only for the form
-  // ... otros campos
-});
-
-// Servidor: extiende con transformaciones
-export const CreateProductSchema = ProductFormSchema.extend({
-  saleDate: z.string().transform(val => new Date(val)), // ← Here we transform the date string to a Date, which is what the server needs.
-  saleId: z.string(),
-});
-
-TODO: Do the same for the the sale schema and TEST all the CRUD from the form to the server
-*/
-export const CreateProductSchema = z.object({
   name: z
     .string("El nombre es requerido")
     .trim()
@@ -31,7 +19,7 @@ export const CreateProductSchema = z.object({
     .max(400, "El nombre es demasiado largo"),
   url: z.url("URL inválida").optional().or(z.literal("")),
   note: z.string("").trim().max(500, "Máximo 500 caracteres").optional(),
-  saleDate: z.string().min(1, "La fecha es requerida"), // TODO: It needs a validation to prevent invalid dates such as "31-03-123456"
+  saleDate: saleDateSchema,
   purchasePrice: z.coerce
     .number("El precio de compra es requerido")
     .positive("El precio de compra debe ser mayor a 0"),
@@ -42,15 +30,22 @@ export const CreateProductSchema = z.object({
     .number("La cantidad es requerida")
     .int("La cantidad debe ser un número entero")
     .positive("La cantidad debe ser mayor a 0"),
-  saleId: z.string().min(1, "La venta es requerida")
 });
 
+// Server schemas
+export const CreateProductSchema = ProductFormSchema.extend({
+  saleDate: saleDateSchema.transform(val => new Date(val)),
+  saleId: z.string().min(1, "La venta es requerida"),
+});
 export const UpdateProductSchema = CreateProductSchema.partial();
-// Form schemas 
-export const ProductFormSchema = CreateProductSchema.omit({ saleId: true});
 
+// Server types
 export type CreateProductData = z.output<typeof CreateProductSchema>;
 export type UpdateProductData = z.output<typeof UpdateProductSchema>;
 
-// Forms types
+// Client types
+export type CreateProductInput = z.input<typeof CreateProductSchema>;
+export type UpdateProductInput = z.input<typeof UpdateProductSchema>;
+
+// Form types
 export type ProductFormData = z.output<typeof ProductFormSchema>;

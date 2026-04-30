@@ -6,8 +6,8 @@ import { salesApi } from "@/lib/api/sales";
 import { SaleContextType, SaleWithRelations } from "./sale.types";
 import { CreateSaleData, UpdateSaleData } from "@/lib/validations/sale.schema";
 import {
-  CreateProductData,
-  UpdateProductData,
+  CreateProductInput,
+  UpdateProductInput,
 } from "@/lib/validations/product.schema";
 import { productsApi } from "@/lib/api/products";
 import { Product } from "@/generated/prisma/client";
@@ -117,7 +117,7 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
 
   // ADD A PRODUCT TO A SALE
   const addProduct = async (
-    data: CreateProductData,
+    data: CreateProductInput,
   ): Promise<Product | null> => {
     setError(null);
     setIsSubmitting(true);
@@ -142,7 +142,7 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
   // UPDATE A PRODUCT IN A SALE
   const updateProduct = async (
     productId: string,
-    data: UpdateProductData,
+    data: UpdateProductInput,
   ): Promise<Product | null> => {
     setError(null);
     setIsSubmitting(true);
