@@ -32,6 +32,12 @@ export const ProductFormSchema = z.object({
     .positive("La cantidad debe ser mayor a 0"),
 });
 
+export const ProductDraftSchema = ProductFormSchema.extend({
+  id: z.string(),
+  subtotal: z.number().default(0),
+  profit: z.number().default(0),
+});
+
 // Server schemas
 export const CreateProductSchema = ProductFormSchema.extend({
   saleDate: saleDateSchema.transform(val => new Date(val)),
@@ -46,6 +52,14 @@ export type UpdateProductData = z.output<typeof UpdateProductSchema>;
 // Client types
 export type CreateProductInput = z.input<typeof CreateProductSchema>;
 export type UpdateProductInput = z.input<typeof UpdateProductSchema>;
+/* VERIFY:
+ * infer is the proper utility type here? or should we use input, since it's used in a function hook and not in a form
+ * Ask if we need a prefix like Create... and also, since we use partial<>,
+ * ask if we need to define a separate type for the update hook draft function, if so
+ * ask the conventional name since this is not nor a form input nor an output form
+ */
+export type ProductDraftData = z.infer<typeof ProductDraftSchema>; 
 
 // Form types
+// VERIFY: Ask if for this type, z.output is right, and understand why
 export type ProductFormData = z.output<typeof ProductFormSchema>;

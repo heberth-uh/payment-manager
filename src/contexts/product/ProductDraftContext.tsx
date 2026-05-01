@@ -1,14 +1,13 @@
 "use client";
 
-import { ProductFormData } from "@/lib/validations/product.schema";
-import { SaleProductData } from "@/lib/validations/sale.schema";
+import { ProductDraftData, ProductFormData } from "@/lib/validations/product.schema";
 import { calculateProductTotals } from "@/lib/utils/productTotals";
 import { createContext, useContext, useState } from "react";
 
 interface ProductDraftContextType {
-  drafts: SaleProductData[];
+  drafts: ProductDraftData[];
   addProductDraft: (data: ProductFormData) => void;
-  updateProductDraft: (id: string, data: Partial<SaleProductData>) => void;
+  updateProductDraft: (id: string, data: Partial<ProductDraftData>) => void;
   deleteProductDraft: (id: string) => void;
 }
 
@@ -19,7 +18,7 @@ export function ProductDraftProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [drafts, setDrafts] = useState<SaleProductData[]>([]);
+  const [drafts, setDrafts] = useState<ProductDraftData[]>([]);
 
   // CREATE DRAFT
   const addProductDraft = (data: ProductFormData) => {
@@ -35,7 +34,7 @@ export function ProductDraftProvider({
   };
 
   // UPDATE DRAFT
-  const updateProductDraft = (id: string, data: Partial<SaleProductData>) => { // REFACTOR: We need to define this type in the schema file and import it here
+  const updateProductDraft = (id: string, data: Partial<ProductDraftData>) => { // REFACTOR: We need to define this type in the schema file and import it here
     setDrafts((prevDrafts) =>
       prevDrafts.map((draft) => {
         if (draft.id !== id) return draft;
