@@ -1,4 +1,4 @@
 import { Product } from "@/generated/prisma/client";
-import { SaleProductData } from "@/lib/validations/sale.schema";
+import { ProductDraftData } from "@/lib/validations/product.schema";
 
-export type ProductOrDraft = Product | SaleProductData;
+export type ProductOrDraft = Product | ProductDraftData;

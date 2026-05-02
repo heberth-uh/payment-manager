@@ -9,7 +9,7 @@ const saleDateSchema = z
     return year >= currentYear - 10 && year <= currentYear;
   }, `La fecha debe estar entre los últimos 10 años y el año actual`);
 
-// Client schemas
+// No transforms
 export const ProductFormSchema = z.object({
   name: z
     .string("El nombre es requerido")
@@ -32,20 +32,29 @@ export const ProductFormSchema = z.object({
     .positive("La cantidad debe ser mayor a 0"),
 });
 
-// Server schemas
+export const ProductDraftSchema = ProductFormSchema.extend({
+  id: z.string(),
+  subtotal: z.number().default(0),
+  profit: z.number().default(0),
+});
+
+// With transforms
 export const CreateProductSchema = ProductFormSchema.extend({
   saleDate: saleDateSchema.transform(val => new Date(val)),
   saleId: z.string().min(1, "La venta es requerida"),
 });
 export const UpdateProductSchema = CreateProductSchema.partial();
 
-// Server types
+// Post-parse (route handlers)
 export type CreateProductData = z.output<typeof CreateProductSchema>;
 export type UpdateProductData = z.output<typeof UpdateProductSchema>;
 
-// Client types
+// Pre-parse (fetch calls)
 export type CreateProductInput = z.input<typeof CreateProductSchema>;
 export type UpdateProductInput = z.input<typeof UpdateProductSchema>;
 
-// Form types
-export type ProductFormData = z.output<typeof ProductFormSchema>;
+// ProductDraftContext
+export type ProductDraftData = z.infer<typeof ProductDraftSchema>;
+
+// RHF useForm
+export type ProductFormData = z.infer<typeof ProductFormSchema>;
