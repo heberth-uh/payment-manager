@@ -43,7 +43,7 @@ function ProductForm({
   onClose,
   onCancel,
 }: ProductFormProps) {
-  const { addProduct, updateProduct, error } = useSales();
+  const { addProduct, updateProduct } = useSales();
   const { addProductDraft, updateProductDraft } = useProductDraft();
 
   const form = useForm<ProductFormData>({
@@ -98,26 +98,26 @@ function ProductForm({
       }
       const changedData = getDirtyFields(form, data);
       const result = await updateProduct(product.id, changedData);
-      if (result) {
+      if (result.success) {
         toast.success("Producto actualizado con éxito");
         onClose?.();
       } else {
-        toast.error(error || "Ocurrió un error al actualizar el producto");
+        toast.error(result.error);
       }
       // Create mode: Add new product to an existing sale
     } else {
-      let newProduct = null;
+      let result = null;
       const draftData: CreateProductInput = {
         ...data,
         saleId: saleId || "",
       };
-      newProduct = await addProduct(draftData);
-      if (newProduct) {
+      result = await addProduct(draftData);
+      if (result.success) {
         toast.success("Se agregó un producto a la venta");
         form.reset();
         onClose?.();
       } else {
-        toast.error("No se pudo agregar el producto");
+        toast.error(result.error);
       }
     }
   };
@@ -126,6 +126,8 @@ function ProductForm({
     Create/Edit product draft. This function is triggered only in draft mode
     Handles "Guardar" button by onclick to save product in the draft context
    */
+  // TODO: Unify this with onSubmit to centralize the save action and just use type=button or type=submit.
+  // Needs to be analyzed which one is better or keep it separated for clarity.
   const handleSave = form.handleSubmit((data) => {
     if (isEditing) {
       if (!product?.id) return;

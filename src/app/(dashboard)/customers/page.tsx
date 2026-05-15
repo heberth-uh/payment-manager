@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
@@ -20,18 +20,22 @@ function CustomersPage() {
     deleteCustomer,
   } = useCustomers();
 
+  useEffect(() => {
+    getCustomers();
+  }, [getCustomers]);
+
   if (error) {
     return <PageContainer>Error {error}</PageContainer>;
   }
 
   const handleDeleteCustomer = async (id: string) => {
     setDeletingId(id);
-    const success = await deleteCustomer(id);
+    const result = await deleteCustomer(id);
     setDeletingId(null);
-    if (success) {
+    if (result.success) {
       toast.success("Se ha eliminado un cliente");
     } else {
-      toast.error(error || "No se pudo eliminar el cliente");
+      toast.error(result.error);
     }
   };
 
@@ -77,7 +81,7 @@ function CustomersPage() {
                 {deletingId === customer.id ? (
                   <div className="flex items-center gap-2">
                     <span className="italic text-gray-600">Eliminando</span>
-                    <div className="size-3 rounded-full border-2 border-gray-600 border-t-transparent animate-spin [animation-duration:0.4s]"></div>
+                    <div className="size-3 rounded-full border-2 border-gray-600 border-t-transparent animate-spin animation-duration:[0.4s]"></div>
                   </div>
                 ) : (
                   <div className="flex gap-2">

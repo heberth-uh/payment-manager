@@ -33,11 +33,17 @@ function SaleForm({ isEditing = false }: { isEditing?: boolean }) {
     sale,
     isFetching,
     isSubmitting,
-    error,
     getSale,
     createSale,
     updateSale,
   } = useSales();
+
+  /*
+   TODO:
+   - get saleId from params. 
+   - In page.tsx (sales/new and sales/edit), get saleId from prop params (check /id/page.tsx) and pass it to this component.
+   - Handle error in page.tsx for /edit when getSale fails and avoid rendering and empty form.
+  */
 
   const form = useForm<CreateSaleData>({
     // TODO: Must use form sale data (new types?), check product zod shcema as reference
@@ -54,7 +60,7 @@ function SaleForm({ isEditing = false }: { isEditing?: boolean }) {
     if (isEditing && saleId) {
       getSale(saleId);
     }
-  }, [isEditing, saleId]);
+  }, [isEditing, saleId, getSale]);
 
   // Reset form with sale data when is fetched
   useEffect(() => {
@@ -64,7 +70,7 @@ function SaleForm({ isEditing = false }: { isEditing?: boolean }) {
         notes: sale?.notes || "",
       });
     }
-  }, [isEditing, sale, form]);
+  }, [isEditing, sale, form, saleId]);
 
   const onsubmit = async (data: CreateSaleData) => {
     if (isEditing && saleId) {
@@ -73,21 +79,21 @@ function SaleForm({ isEditing = false }: { isEditing?: boolean }) {
         return;
       }
       const result = await updateSale(saleId, data);
-      if (result) {
+      if (result.success) {
         toast.success("Venta actualizada con éxito");
         router.push(`/sales/${saleId}`);
       } else {
-        toast.error(error || "Error al actualizar la venta");
+        toast.error(result.error);
       }
     } else {
       const saleData = { ...data, products: drafts };
-      const newSale = await createSale(saleData);
-      if (newSale) {
+      const result = await createSale(saleData);
+      if (result.success) {
         toast.success("Nueva venta creada");
         form.reset();
-        router.push(`/sales/${newSale.id}`);
+        router.push(`/sales/${result.data?.id}`);
       } else {
-        toast.error(error || "Error al crear el venta");
+        toast.error(result.error);
       }
     }
   };

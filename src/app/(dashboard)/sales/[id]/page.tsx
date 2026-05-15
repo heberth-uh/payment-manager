@@ -2,15 +2,12 @@ import { PageContainer } from "@/components/layout/PageContainer";
 import { ProductDraftProvider } from "@/contexts/product/ProductDraftContext";
 import SaleDetails from "@/components/sales/SaleDetails";
 
-function SalePage({ params }: { params: { id: string } }) {
-  // TODO: Pass id prop to SaleDetails instead of relying on useParams() in child component.
-  // Update SaleDetails signature to accept id prop and remove useParams() hook.
-  //    function SalePage({ params }: { params: { id: string } } {...}
-  //    function SaleDetails({ id }: { id: string }) {...const saleId = id;...}
+async function SalePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   return (
     <ProductDraftProvider>
       <PageContainer>
-        <SaleDetails />
+        <SaleDetails id={id} />
       </PageContainer>
     </ProductDraftProvider>
   );

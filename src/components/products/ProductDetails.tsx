@@ -42,8 +42,8 @@ function ProductDetails({
     if (isDraftMode) {
       deleteProductDraft(product.id);
     } else {
-      const success = await deleteProduct(product.id);
-      if (!success) {
+      const result = await deleteProduct(product.id);
+      if (!result.success) {
         toast.error("Ocurrió un error al eliminar este artículo");
         return;
       }

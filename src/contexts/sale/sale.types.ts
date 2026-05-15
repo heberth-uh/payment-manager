@@ -1,4 +1,5 @@
 import { Prisma, Product } from "@/generated/prisma/client";
+import { ActionResult } from "@/lib/types";
 import {
   CreateProductInput,
   UpdateProductInput,
@@ -17,16 +18,18 @@ export interface SaleContextType {
   error: string | null;
   getSales: () => Promise<void>;
   getSale: (saleId: string, forceRefresh?: boolean) => Promise<void>;
-  createSale: (data: CreateSaleData) => Promise<SaleWithRelations | null>;
+  createSale: (
+    data: CreateSaleData,
+  ) => Promise<ActionResult<SaleWithRelations>>;
   updateSale: (
     saleId: string,
     data: UpdateSaleData,
-  ) => Promise<SaleWithRelations | null>;
-  deleteSale: (saleId: string) => Promise<boolean>;
-  addProduct: (data: CreateProductInput) => Promise<Product | null>;
+  ) => Promise<ActionResult<SaleWithRelations>>;
+  deleteSale: (saleId: string) => Promise<ActionResult>;
+  addProduct: (data: CreateProductInput) => Promise<ActionResult<Product>>;
   updateProduct: (
     productId: string,
     data: UpdateProductInput,
-  ) => Promise<Product | null>;
-  deleteProduct: (productId: string) => Promise<boolean>;
+  ) => Promise<ActionResult<Product>>;
+  deleteProduct: (productId: string) => Promise<ActionResult>;
 }

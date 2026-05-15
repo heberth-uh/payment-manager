@@ -31,7 +31,6 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
   const {
     customer,
     isFetching,
-    error,
     getCustomer,
     createCustomer,
     updateCustomer,
@@ -72,20 +71,20 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
         return;
       }
       const result = await updateCustomer(customerId, data);
-      if (result) {
+      if (result.success) {
         toast.success("Cliente actualizado con éxito");
         router.push(`/customers/${customerId}`);
       } else {
-        toast.error(error || "Error al actualizar el cliente"); // FIXME: When we get an error. The customer view page shows the error instead of the details. it must show the error in the toast and then clean the error. Fix this behavior in all form components
+        toast.error(result.error);
       }
     } else {
-      const newCustomer = await createCustomer(data);
-      if (newCustomer) {
+      const result = await createCustomer(data);
+      if (result.success) {
         toast.success("Nuevo cliente agregado");
         form.reset();
-        router.push(`/customers/${newCustomer.id}`);
+        router.push(`/customers/${result.data?.id}`);
       } else {
-        toast.error(error || "Error al crear el cliente"); 
+        toast.error(result.error);
       }
     }
   };

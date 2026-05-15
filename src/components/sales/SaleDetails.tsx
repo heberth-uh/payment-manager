@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { Label } from "@/components/ui/label";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useSales } from "@/contexts/sale/SaleContext";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
@@ -11,9 +11,7 @@ import ConfirmaDialog from "@/components/ui/ConfirmaDialog";
 import { toast } from "sonner";
 import ProductListSection from "@/components/products/ProductListSection";
 
-function SaleDetails() {
-  const params = useParams();
-  const saleId = Array.isArray(params.id) ? params.id[0] : params.id;
+function SaleDetails({ id: saleId }: { id: string }) {
   const router = useRouter();
   const { sale, isFetching, error, getSale, deleteSale } = useSales();
 
@@ -41,8 +39,8 @@ function SaleDetails() {
   }
 
   const handleDeleteSale = async (id: string) => {
-    const success = await deleteSale(id);
-    if (success) {
+    const result = await deleteSale(id);
+    if (result.success) {
       toast.success("Se ha eliminado una venta");
       router.push("/sales");
     } else {
@@ -73,7 +71,7 @@ function SaleDetails() {
         <Label>Fecha de última venta</Label>
         <p>
           {sale?.lastSaleDate
-            ? new Date(sale.lastSaleDate).toLocaleString()
+            ? new Date(sale.lastSaleDate).toLocaleString() // TODO: Create an utility function to formate dates
             : "-"}
         </p>
       </div>

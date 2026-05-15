@@ -3,12 +3,17 @@
 import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
 import { useSales } from "@/contexts/sale/SaleContext";
+import { extractDateOnly } from "@/lib/utils/date";
 import { RefreshCw } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
 
 function SalesPage() {
   const { sales, isFetching, error, getSales } = useSales();
+
+  useEffect(() => {
+    getSales();
+  }, [getSales]);
 
   if (error) {
     return <PageContainer>Error {error}</PageContainer>; // TODO: Create Error component
@@ -53,7 +58,11 @@ function SalesPage() {
                   <p>
                     {`${sale?.customer.name}${" " + sale?.customer.lastname}`}
                   </p>
-                  <p>{sale.lastSaleDate.toLocaleString()}</p>
+                  <p>
+                    {sale?.lastSaleDate
+                      ? extractDateOnly(sale.lastSaleDate)
+                      : "-"}
+                  </p>
                   <div>{sale.status}</div>
                 </Link>
               </li>

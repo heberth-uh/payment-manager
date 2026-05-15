@@ -2,7 +2,7 @@
 
 import { ProductDraftData, ProductFormData } from "@/lib/validations/product.schema";
 import { calculateProductTotals } from "@/lib/utils/productTotals";
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 
 interface ProductDraftContextType {
   drafts: ProductDraftData[];
@@ -21,7 +21,7 @@ export function ProductDraftProvider({
   const [drafts, setDrafts] = useState<ProductDraftData[]>([]);
 
   // CREATE DRAFT
-  const addProductDraft = (data: ProductFormData) => {
+  const addProductDraft = useCallback((data: ProductFormData) => {
     const { storedTotals } = calculateProductTotals(
       data.unitPrice,
       data.purchasePrice,
@@ -31,28 +31,31 @@ export function ProductDraftProvider({
       ...prevDrafts,
       { ...data, id: crypto.randomUUID(), ...storedTotals },
     ]);
-  };
+  }, []);
 
   // UPDATE DRAFT
-  const updateProductDraft = (id: string, data: Partial<ProductDraftData>) => {
-    setDrafts((prevDrafts) =>
-      prevDrafts.map((draft) => {
-        if (draft.id !== id) return draft;
-        const merged = { ...draft, ...data };
-        const { storedTotals } = calculateProductTotals(
-          merged.unitPrice,
-          merged.purchasePrice,
-          merged.quantity,
-        );
-        return { ...merged, ...storedTotals };
-      }),
-    );
-  };
+  const updateProductDraft = useCallback(
+    (id: string, data: Partial<ProductDraftData>) => {
+      setDrafts((prevDrafts) =>
+        prevDrafts.map((draft) => {
+          if (draft.id !== id) return draft;
+          const merged = { ...draft, ...data };
+          const { storedTotals } = calculateProductTotals(
+            merged.unitPrice,
+            merged.purchasePrice,
+            merged.quantity,
+          );
+          return { ...merged, ...storedTotals };
+        }),
+      );
+    },
+    [],
+  );
 
   // DELETE DRAFT
-  const deleteProductDraft = (id: string) => {
+  const deleteProductDraft = useCallback((id: string) => {
     setDrafts((prevDrafts) => prevDrafts.filter((draft) => draft.id !== id));
-  };
+  }, []);
 
   return (
     <ProductDraftContext.Provider

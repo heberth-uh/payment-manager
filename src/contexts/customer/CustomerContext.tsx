@@ -7,8 +7,9 @@ import {
   UpdateCustomerData,
 } from "@/lib/validations/customer.schema";
 import { Customer } from "@/generated/prisma/client";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useState } from "react";
 import { CustomerContextType } from "./customer.types";
+import { ActionResult } from "@/lib/types";
 
 const CustomerContext = createContext<CustomerContextType | null>(null);
 
@@ -20,7 +21,7 @@ export function CustomerProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   // GET ALL
-  const getCustomers = async (search?: string) => {
+  const getCustomers = useCallback(async (search?: string) => {
     setError(null);
     setIsFetching(true);
 
@@ -32,91 +33,93 @@ export function CustomerProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsFetching(false);
     }
-  };
+  }, []);
 
   // GET BY ID
-  const getCustomer = async (customerId: string, forceRefresh?: boolean) => {
-    if (!customerId) return;
+  const getCustomer = useCallback(
+    async (customerId: string, forceRefresh?: boolean) => {
+      if (!customerId) return;
 
-    if (!forceRefresh && customer?.id === customerId) return;
-    setError(null);
-    setIsFetching(true);
+      if (!forceRefresh && customer?.id === customerId) return;
+      setError(null);
+      setIsFetching(true);
 
-    try {
-      const data = await customersApi.getById(customerId);
-      setCustomer(data);
-    } catch (error) {
-      setError(handleClientError(error));
-    } finally {
-      setIsFetching(false);
-    }
-  };
+      try {
+        const data = await customersApi.getById(customerId);
+        setCustomer(data);
+      } catch (error) {
+        setError(handleClientError(error));
+      } finally {
+        setIsFetching(false);
+      }
+    },
+    [customer?.id],
+  );
 
   // CREATE
-  const createCustomer = async (
-    data: CreateCustomerData
-  ): Promise<Customer | null> => {
-    setIsSubmitting(true);
-    setError(null);
+  const createCustomer = useCallback(
+    async (data: CreateCustomerData): Promise<ActionResult<Customer>> => {
+      setIsSubmitting(true);
+      setError(null);
 
-    try {
-      const newCustomer = await customersApi.create(data);
-      setCustomer(newCustomer);
-      setCustomers((prev) => [...prev, newCustomer]);
-      return newCustomer;
-    } catch (error) {
-      setError(handleClientError(error));
-      return null;
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+      try {
+        const newCustomer = await customersApi.create(data);
+        setCustomer(newCustomer);
+        setCustomers((prev) => [...prev, newCustomer]);
+        return { success: true, data: newCustomer };
+      } catch (error) {
+        return { success: false, error: handleClientError(error) };
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [],
+  );
 
   // UPDATE
-  const updateCustomer = async (
-    customerId: string,
-    data: UpdateCustomerData
-  ): Promise<Customer | null> => {
-    if (!customerId) return null;
-    setError(null);
-    setIsSubmitting(true);
-    try {
-      const updatedCustomer = await customersApi.update(customerId, data);
-      setCustomer(updatedCustomer);
-      setCustomers((prev) =>
-        prev.map((c) => (c.id === customerId ? updatedCustomer : c))
-      );
-      return updatedCustomer;
-    } catch (error) {
-      setError(handleClientError(error));
-      return null;
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const updateCustomer = useCallback(
+    async (
+      customerId: string,
+      data: UpdateCustomerData,
+    ): Promise<ActionResult<Customer>> => {
+      if (!customerId) return { success: false, error: "Cliente no encontado" };
+      setError(null);
+      setIsSubmitting(true);
+      try {
+        const updatedCustomer = await customersApi.update(customerId, data);
+        setCustomer(updatedCustomer);
+        setCustomers((prev) =>
+          prev.map((c) => (c.id === customerId ? updatedCustomer : c)),
+        );
+        return { success: true, data: updatedCustomer };
+      } catch (error) {
+        return { success: false, error: handleClientError(error) };
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [],
+  );
 
   // DELETE
-  const deleteCustomer = async (customerId: string): Promise<boolean> => {
-    setIsSubmitting(true);
-    setError(null);
+  const deleteCustomer = useCallback(
+    async (customerId: string): Promise<ActionResult> => {
+      setIsSubmitting(true);
+      setError(null);
 
-    try {
-      await customersApi.delete(customerId);
-      setCustomers((prev) => prev.filter((c) => c.id !== customerId));
-      if (customer?.id === customerId) setCustomer(null);
-      return true;
-    } catch (error) {
-      setError(handleClientError(error));
-      return false;
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Auto fetch customers on mount
-  useEffect(() => {
-    getCustomers();
-  }, []);
+      try {
+        await customersApi.delete(customerId);
+        setCustomers((prev) => prev.filter((c) => c.id !== customerId));
+        if (customer?.id === customerId) setCustomer(null);
+        return { success: true };
+      } catch (error) {
+        return { success: false, error: handleClientError(error) };
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [customer?.id],
+  );
 
   return (
     <CustomerContext.Provider
