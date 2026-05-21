@@ -10,34 +10,28 @@ import {
 } from "../ui/form";
 import { useForm } from "react-hook-form";
 import {
-  CreateCustomerData,
-  CreateCustomerSchema,
+  CustomerFormData,
+  CustomerFormSchema,
 } from "@/lib/validations/customer.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useCustomers } from "@/contexts/customer/CustomerContext";
 
 interface CustomerFormProps {
+  customerId?: string;
   isEditing?: boolean;
 }
 
-function CustomerForm({ isEditing = false }: CustomerFormProps) {
+function CustomerForm({ customerId, isEditing = false }: CustomerFormProps) {
   const router = useRouter();
-  const params = useParams();
-  const customerId = Array.isArray(params.id) ? params.id[0] : params.id;
-  const {
-    customer,
-    isFetching,
-    getCustomer,
-    createCustomer,
-    updateCustomer,
-  } = useCustomers();
+  const { customer, isFetching, getCustomer, createCustomer, updateCustomer } =
+    useCustomers();
 
-  const form = useForm<CreateCustomerData>({
-    resolver: zodResolver(CreateCustomerSchema),
+  const form = useForm<CustomerFormData>({
+    resolver: zodResolver(CustomerFormSchema),
     defaultValues: {
       name: "",
       lastname: "",
@@ -64,7 +58,12 @@ function CustomerForm({ isEditing = false }: CustomerFormProps) {
       });
     }
   }, [isEditing, customer, customerId, form]);
-  const onSubmit = async (data: CreateCustomerData) => {
+
+  if (isEditing && !customer && !isFetching) {
+    return <p>No se encontró el cliente</p>;
+  }
+
+  const onSubmit = async (data: CustomerFormData) => {
     if (isEditing && customerId) {
       if (!form.formState.isDirty) {
         router.push(`/customers/${customerId}`);

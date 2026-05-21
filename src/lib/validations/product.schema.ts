@@ -38,7 +38,7 @@ export const ProductDraftSchema = ProductFormSchema.extend({
   profit: z.number().default(0),
 });
 
-// With transforms
+// Server Schemas (will hold transforms)
 export const CreateProductSchema = ProductFormSchema.extend({
   saleDate: saleDateSchema.transform(val => new Date(val)),
   saleId: z.string().min(1, "La venta es requerida"),

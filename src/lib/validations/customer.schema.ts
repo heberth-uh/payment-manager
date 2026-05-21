@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const CreateCustomerSchema = z.object({
+export const CustomerFormSchema = z.object({
   name: z
     .string("El nombre es requerido")
     .trim()
@@ -17,7 +17,17 @@ export const CreateCustomerSchema = z.object({
   address: z.string().optional(),
 });
 
+// Server Schemas (will hold transforms)
+export const CreateCustomerSchema = CustomerFormSchema.extend({});
 export const UpdateCustomerSchema = CreateCustomerSchema.partial();
 
-export type CreateCustomerData = z.infer<typeof CreateCustomerSchema>;
-export type UpdateCustomerData = z.infer<typeof UpdateCustomerSchema>;
+// Pre-parse (fetch calls)
+export type CreateCustomerInput = z.input<typeof CreateCustomerSchema>;
+export type UpdateCustomerInput = z.input<typeof UpdateCustomerSchema>;
+
+// Post-parse (route handlers)
+export type CreateCustomerData = z.output<typeof CreateCustomerSchema>;
+export type UpdateCustomerData = z.output<typeof UpdateCustomerSchema>;
+
+// RHF useForm
+export type CustomerFormData = z.infer<typeof CustomerFormSchema>;

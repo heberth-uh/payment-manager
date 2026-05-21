@@ -1,7 +1,7 @@
 import { Customer } from "@/generated/prisma/client";
 import {
-  CreateCustomerData,
-  UpdateCustomerData,
+  CreateCustomerInput,
+  UpdateCustomerInput,
 } from "@/lib/validations/customer.schema";
 
 export const customersApi = {
@@ -31,7 +31,7 @@ export const customersApi = {
   },
 
   // CREATE
-  async create(data: CreateCustomerData): Promise<Customer> {
+  async create(data: CreateCustomerInput): Promise<Customer> {
     const response = await fetch("/api/customers", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -48,7 +48,7 @@ export const customersApi = {
   // UPDATE
   async update(
     customerId: string,
-    data: UpdateCustomerData
+    data: UpdateCustomerInput
   ): Promise<Customer> {
     const response = await fetch(`/api/customers/${customerId}`, {
       method: "PUT",

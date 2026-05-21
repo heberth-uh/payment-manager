@@ -1,5 +1,8 @@
 import { SaleWithRelations } from "@/contexts/sale/sale.types";
-import { CreateSaleData, UpdateSaleData } from "@/lib/validations/sale.schema";
+import {
+  CreateSaleInput,
+  UpdateSaleInput,
+} from "@/lib/validations/sale.schema";
 import { extractErrorMessage } from "@/lib/utils/client-error";
 
 export const salesApi = {
@@ -32,7 +35,7 @@ export const salesApi = {
   },
 
   // CREATE
-  async create(data: CreateSaleData): Promise<SaleWithRelations> {
+  async create(data: CreateSaleInput): Promise<SaleWithRelations> {
     const response = await fetch("/api/sales", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -52,7 +55,7 @@ export const salesApi = {
   // UPDATE
   async update(
     saleId: string,
-    data: UpdateSaleData,
+    data: UpdateSaleInput,
   ): Promise<SaleWithRelations> {
     const response = await fetch(`/api/sales/${saleId}`, {
       method: "PUT",

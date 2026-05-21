@@ -3,8 +3,8 @@
 import { customersApi } from "@/lib/api/customers";
 import { handleClientError } from "@/lib/utils/client-error";
 import {
-  CreateCustomerData,
-  UpdateCustomerData,
+  CreateCustomerInput,
+  UpdateCustomerInput,
 } from "@/lib/validations/customer.schema";
 import { Customer } from "@/generated/prisma/client";
 import React, { createContext, useCallback, useContext, useState } from "react";
@@ -58,7 +58,7 @@ export function CustomerProvider({ children }: { children: React.ReactNode }) {
 
   // CREATE
   const createCustomer = useCallback(
-    async (data: CreateCustomerData): Promise<ActionResult<Customer>> => {
+    async (data: CreateCustomerInput): Promise<ActionResult<Customer>> => {
       setIsSubmitting(true);
       setError(null);
 
@@ -80,7 +80,7 @@ export function CustomerProvider({ children }: { children: React.ReactNode }) {
   const updateCustomer = useCallback(
     async (
       customerId: string,
-      data: UpdateCustomerData,
+      data: UpdateCustomerInput,
     ): Promise<ActionResult<Customer>> => {
       if (!customerId) return { success: false, error: "Cliente no encontado" };
       setError(null);

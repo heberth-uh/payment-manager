@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ProductDraftSchema } from "./product.schema";
 
-export const CreateSaleSchema = z.object({
+export const SaleFormSchema = z.object({
   status: z.enum(["PENDING", "PAID", "CANCELED"]).default("PENDING").optional(),
   lastSaleDate: z.date().optional(),
   lastPaymentDate: z.date().optional(),
@@ -11,10 +11,20 @@ export const CreateSaleSchema = z.object({
     .trim()
     .optional(),
   customerId: z.string().min(1, "El cliente es requerido"),
-  products: z.array(ProductDraftSchema).default([]),
+  products: z.array(ProductDraftSchema).default([]), // Only consumed during sale creation; ignored on update
 });
 
+// Server Schemas (will hold transforms)
+export const CreateSaleSchema = SaleFormSchema.extend({});
 export const UpdateSaleSchema = CreateSaleSchema.partial();
 
-export type CreateSaleData = z.input<typeof CreateSaleSchema>;
-export type UpdateSaleData = z.input<typeof UpdateSaleSchema>;
+// Pre-parse (fetch calls)
+export type CreateSaleInput = z.input<typeof CreateSaleSchema>;
+export type UpdateSaleInput = z.input<typeof UpdateSaleSchema>;
+
+// Post-parse (route handlers)
+export type CreateSaleData = z.output<typeof CreateSaleSchema>;
+export type UpdateSaleData = z.output<typeof UpdateSaleSchema>;
+
+// RHF useForm
+export type SaleFormData = z.infer<typeof SaleFormSchema>;

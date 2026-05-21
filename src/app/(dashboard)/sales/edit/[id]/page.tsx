@@ -3,11 +3,12 @@ import { PageContainer } from "@/components/layout/PageContainer";
 import SaleForm from "@/components/sales/SaleForm";
 import { ProductDraftProvider } from "@/contexts/product/ProductDraftContext";
 
-function EditSalePage() {
+async function EditSalePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   return (
     <ProductDraftProvider>
       <PageContainer>
-        <SaleForm isEditing/>
+        <SaleForm isEditing saleId={id} />
       </PageContainer>
     </ProductDraftProvider>
   );

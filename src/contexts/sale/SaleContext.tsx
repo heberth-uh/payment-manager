@@ -1,15 +1,13 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import { handleClientError } from "@/lib/utils/client-error";
 import { salesApi } from "@/lib/api/sales";
 import { SaleContextType, SaleWithRelations } from "./sale.types";
-import { CreateSaleData, UpdateSaleData } from "@/lib/validations/sale.schema";
+import {
+  CreateSaleInput,
+  UpdateSaleInput,
+} from "@/lib/validations/sale.schema";
 import {
   CreateProductInput,
   UpdateProductInput,
@@ -65,7 +63,7 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
 
   // CREATE
   const createSale = useCallback(
-    async (data: CreateSaleData): Promise<ActionResult<SaleWithRelations>> => {
+    async (data: CreateSaleInput): Promise<ActionResult<SaleWithRelations>> => {
       setError(null);
       setIsSubmitting(true);
 
@@ -87,7 +85,7 @@ export function SaleProvider({ children }: { children: React.ReactNode }) {
   const updateSale = useCallback(
     async (
       saleId: string,
-      data: UpdateSaleData,
+      data: UpdateSaleInput,
     ): Promise<ActionResult<SaleWithRelations>> => {
       setError(null);
       setIsSubmitting(true);

@@ -9,10 +9,10 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { useForm } from "react-hook-form";
+import { Resolver, useForm } from "react-hook-form";
 import {
-  CreateSaleData,
-  CreateSaleSchema,
+  SaleFormSchema,
+  SaleFormData,
 } from "@/lib/validations/sale.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../ui/button";
@@ -20,38 +20,27 @@ import { Textarea } from "../ui/textarea";
 import CustomerCombobox from "../customers/CustomerCombobox";
 import { useSales } from "@/contexts/sale/SaleContext";
 import { toast } from "sonner";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import ProductListSection from "../products/ProductListSection";
 import { useProductDraft } from "@/contexts/product/ProductDraftContext";
 
-function SaleForm({ isEditing = false }: { isEditing?: boolean }) {
+interface SaleFormProps {
+  saleId?: string;
+  isEditing?: boolean;
+}
+
+function SaleForm({ saleId, isEditing = false }: SaleFormProps) {
   const router = useRouter();
-  const params = useParams();
-  const saleId = Array.isArray(params.id) ? params.id[0] : params.id;
   const { drafts } = useProductDraft();
-  const {
-    sale,
-    isFetching,
-    isSubmitting,
-    getSale,
-    createSale,
-    updateSale,
-  } = useSales();
+  const { sale, isFetching, isSubmitting, getSale, createSale, updateSale } =
+    useSales();
 
-  /*
-   TODO:
-   - get saleId from params. 
-   - In page.tsx (sales/new and sales/edit), get saleId from prop params (check /id/page.tsx) and pass it to this component.
-   - Handle error in page.tsx for /edit when getSale fails and avoid rendering and empty form.
-  */
-
-  const form = useForm<CreateSaleData>({
-    // TODO: Must use form sale data (new types?), check product zod shcema as reference
-    resolver: zodResolver(CreateSaleSchema),
+  const form = useForm<SaleFormData>({
+    resolver: zodResolver(SaleFormSchema) as Resolver<SaleFormData>,
     defaultValues: {
       customerId: "",
       notes: "",
-      products: [], // TODO: Add sale?.products and fix types errors
+      products: [],
     },
   });
 
@@ -72,7 +61,11 @@ function SaleForm({ isEditing = false }: { isEditing?: boolean }) {
     }
   }, [isEditing, sale, form, saleId]);
 
-  const onsubmit = async (data: CreateSaleData) => {
+  if (isEditing && !sale && !isFetching) {
+    return <p>No se encontró la venta</p>;
+  }
+
+  const onsubmit = async (data: SaleFormData) => {
     if (isEditing && saleId) {
       if (!form.formState.isDirty) {
         router.push(`/sales/${saleId}`);
