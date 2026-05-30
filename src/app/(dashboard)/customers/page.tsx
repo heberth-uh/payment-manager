@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
-import ConfirmaDialog from "@/components/ui/ConfirmaDialog";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { toast } from "sonner";
 import { useCustomers } from "@/contexts/customer/CustomerContext";
 import { Pencil, RefreshCw, Trash } from "lucide-react";
@@ -85,7 +85,7 @@ function CustomersPage() {
                   </div>
                 ) : (
                   <div className="flex gap-2">
-                    <ConfirmaDialog
+                    <ConfirmDialog
                       title="Eliminar cliente"
                       description={`¿Estás seguro de eliminar a ${customer.name}? Esta acción no se puede deshacer.`}
                       actionConfirm={() => handleDeleteCustomer(customer.id)}
@@ -99,7 +99,7 @@ function CustomersPage() {
                       >
                         <Trash />
                       </Button>
-                    </ConfirmaDialog>
+                    </ConfirmDialog>
                     <Link href={`/customers/edit/${customer.id}`}>
                       <Button
                         type="button"

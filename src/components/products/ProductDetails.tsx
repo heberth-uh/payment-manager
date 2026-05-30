@@ -4,7 +4,7 @@ import { Label } from "@radix-ui/react-label";
 import React from "react";
 import { Button } from "../ui/button";
 import { getURLDomain } from "@/lib/utils/url-helper";
-import ConfirmaDialog from "../ui/ConfirmaDialog";
+import ConfirmDialog from "../ui/ConfirmDialog";
 import { useSales } from "@/contexts/sale/SaleContext";
 import { toast } from "sonner";
 import { extractDateOnly } from "@/lib/utils/date";
@@ -55,7 +55,7 @@ function ProductDetails({
       {onEdit && (
         <div className="flex gap-2">
           <Button onClick={onEdit}>Editar</Button>
-          <ConfirmaDialog
+          <ConfirmDialog
             actionConfirm={handleDelete}
             title={"Eliminar artículo"}
             description={
@@ -71,7 +71,7 @@ function ProductDetails({
             >
               Eliminar
             </Button>
-          </ConfirmaDialog>
+          </ConfirmDialog>
         </div>
       )}
       <h3 className="font-bold text-base">{product.name}</h3>

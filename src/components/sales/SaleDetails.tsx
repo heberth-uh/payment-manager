@@ -7,7 +7,7 @@ import { useSales } from "@/contexts/sale/SaleContext";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash } from "lucide-react";
-import ConfirmaDialog from "@/components/ui/ConfirmaDialog";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { toast } from "sonner";
 import ProductListSection from "@/components/products/ProductListSection";
 
@@ -83,7 +83,7 @@ function SaleDetails({ id: saleId }: { id: string }) {
       </div>
 
       <div className="my-6 flex justify-end items-center gap-2">
-        <ConfirmaDialog
+        <ConfirmDialog
           title="Eliminar venta"
           description={dialogDescription}
           confirmText="Eliminar"
@@ -92,7 +92,7 @@ function SaleDetails({ id: saleId }: { id: string }) {
           <Button type="button" variant="secondary" size="sm" title="Eliminar">
             <Trash />
           </Button>
-        </ConfirmaDialog>
+        </ConfirmDialog>
         <Button
           variant="secondary"
           size="sm"

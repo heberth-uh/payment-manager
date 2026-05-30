@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import ConfirmaDialog from "@/components/ui/ConfirmaDialog";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { Label } from "@/components/ui/label";
 import { useCustomers } from "@/contexts/customer/CustomerContext";
 import { MapPin, Pencil, Phone, Trash } from "lucide-react";
@@ -51,7 +51,7 @@ function CustomerDetails({ id: customerId }: { id: string }) {
           </h1>
         </div>
         <div className="flex gap-2">
-          <ConfirmaDialog
+          <ConfirmDialog
             title="Eliminar cliente"
             description={dialogDescription}
             actionConfirm={() => handleDeleteCustomer(customerId)}
@@ -64,7 +64,7 @@ function CustomerDetails({ id: customerId }: { id: string }) {
             >
               <Trash />
             </Button>
-          </ConfirmaDialog>
+          </ConfirmDialog>
           <Link href={`/customers/edit/${customer?.id}`}>
             <Button type="button" variant="secondary" size="sm" title="Editar">
               <Pencil />

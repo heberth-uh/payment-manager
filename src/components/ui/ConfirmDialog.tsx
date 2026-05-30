@@ -11,7 +11,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-interface ConfirmaDialogProps {
+interface ConfirmDialogProps {
   children: React.ReactNode;
   title: string;
   description?: string | React.ReactNode;
@@ -20,14 +20,14 @@ interface ConfirmaDialogProps {
   actionConfirm?: () => void;
 }
 
-function ConfirmaDialog({
+function ConfirmDialog({
   children,
   title,
   description,
   confirmText = "Continuar",
   cancelText = "Cancelar",
   actionConfirm,
-}: ConfirmaDialogProps) {
+}: ConfirmDialogProps) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
@@ -47,4 +47,4 @@ function ConfirmaDialog({
   );
 }
 
-export default ConfirmaDialog;
+export default ConfirmDialog;

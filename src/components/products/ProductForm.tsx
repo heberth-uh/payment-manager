@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import { ProductOrDraft } from "./types";
 import { useProductDraft } from "@/contexts/product/ProductDraftContext";
 import { getDirtyFields, handleNumberInputChange } from "@/lib/utils/form";
+import ConfirmDialog from "../ui/ConfirmDialog";
 
 interface ProductFormProps {
   saleId?: string;
@@ -89,51 +90,48 @@ function ProductForm({
     }
   }, [isEditing, product, form, onClose]);
 
-  const onSubmit = async (data: ProductFormData) => {
-    // Edit mode: Update existing product, only send changed fields
+  // Handle form submission for both create and edit modes, as well as draft vs regular products
+  const handleSave = form.handleSubmit(async (data) => {
+    // In edit mode
     if (isEditing && product) {
       if (!form.formState.isDirty) {
         onClose?.();
         return;
       }
-      const changedData = getDirtyFields(form, data);
-      const result = await updateProduct(product.id, changedData);
-      if (result.success) {
-        toast.success("Producto actualizado con éxito");
-        onClose?.();
+      // Editing draft product
+      if (isDraftMode) {
+        updateProductDraft(product.id, data);
       } else {
-        toast.error(result.error);
+        // Editing product
+        const changedData = getDirtyFields(form, data);
+        const result = await updateProduct(product.id, changedData);
+        if (result.success) {
+          toast.success("Producto actualizado con éxito");
+        } else {
+          toast.error(result.error);
+          return;
+        }
       }
-      // Create mode: Add new product to an existing sale
+      // In create mode
     } else {
-      let result = null;
-      const draftData: CreateProductInput = {
-        ...data,
-        saleId: saleId || "",
-      };
-      result = await addProduct(draftData);
-      if (result.success) {
-        toast.success("Se agregó un producto a la venta");
-        form.reset();
-        onClose?.();
+      if (isDraftMode) {
+        // Createting new draft product
+        addProductDraft(data);
       } else {
-        toast.error(result.error);
+        // Creating new product
+        if (!saleId) {
+          toast.error("No se pudo agregar el producto. Venta no encontrada.");
+          return;
+        }
+        const productData: CreateProductInput = { ...data, saleId };
+        const result = await addProduct(productData);
+        if (result.success) {
+          toast.success("Se agregó un producto a la venta");
+        } else {
+          toast.error(result.error);
+          return;
+        }
       }
-    }
-  };
-
-  /*
-    Create/Edit product draft. This function is triggered only in draft mode
-    Handles "Guardar" button by onclick to save product in the draft context
-   */
-  // TODO: Unify this with onSubmit to centralize the save action and just use type=button or type=submit.
-  // Needs to be analyzed which one is better or keep it separated for clarity.
-  const handleSave = form.handleSubmit((data) => {
-    if (isEditing) {
-      if (!product?.id) return;
-      updateProductDraft(product.id, data);
-    } else {
-      addProductDraft(data);
     }
     form.reset();
     onClose?.();
@@ -146,12 +144,23 @@ function ProductForm({
     onCancel?.();
   };
 
+  // Enter submits from any input (skips textarea + IME composition).
+  // stopPropagation prevents the keydown from reaching the outer SaleForm.
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (e.key !== "Enter") return;
+    if ((e.target as HTMLElement).tagName === "TEXTAREA") return;
+    if (e.nativeEvent.isComposing) return;
+    e.preventDefault();
+    e.stopPropagation();
+    handleSave();
+  };
+
   return (
     <Form {...form}>
       <form
         className="flex flex-col h-full"
-        onSubmit={form.handleSubmit(onSubmit)}
         noValidate
+        onKeyDown={handleKeyDown}
       >
         <div className="flex flex-col gap-4 flex-1 overflow-auto px-4 pb-6">
           <FormField
@@ -314,20 +323,30 @@ function ProductForm({
           />
         </div>
         <div className="flex justify-center items-center gap-4 border-t-2 py-4 shrink-0 px-4">
+          <ConfirmDialog
+            title={isEditing ? "Cancelar edición" : "Cancelar creación"}
+            description="¿Estás seguro de cancelar? Se perderán los cambios no guardados."
+            actionConfirm={handleOnCancel}
+          >
+            <Button
+              type="button"
+              variant="secondary"
+              className="grow"
+              disabled={form.formState.isSubmitting}
+              onClick={(e) => {
+                if (!form.formState.isDirty) {
+                  e.preventDefault();
+                  handleOnCancel();
+                }
+              }}
+            >
+              Cancelar
+            </Button>
+          </ConfirmDialog>
           <Button
             type="button"
-            variant="secondary"
-            onClick={handleOnCancel}
             className="grow"
-            disabled={form.formState.isSubmitting}
-          >
-            Cancelar
-            {/* TODO: Add a confirmation dialog */}
-          </Button>{" "}
-          <Button
-            type={isDraftMode ? "button" : "submit"}
-            className="grow"
-            onClick={isDraftMode ? handleSave : undefined}
+            onClick={handleSave}
             disabled={form.formState.isSubmitting}
           >
             {form.formState.isSubmitting ? "Guardando" : "Guardar"}
