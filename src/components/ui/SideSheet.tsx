@@ -18,6 +18,8 @@ interface SideSheetProps {
   description?: string | React.ReactNode;
   closeText?: string;
   showFooter?: boolean;
+  closeOnInteractOutside?: boolean;
+  showCloseButton?: boolean;
 }
 
 export function SideSheet({
@@ -27,15 +29,31 @@ export function SideSheet({
   description,
   closeText = "Cerrar",
   showFooter = false,
+  closeOnInteractOutside = true,
+  showCloseButton = true,
 }: SideSheetProps) {
   const [open, setOpen] = useState(false);
 
   const closeSheet = () => setOpen(false);
 
+  const handleOnInteractOutside = (event: Event) => {
+    if (!closeOnInteractOutside) event.preventDefault();
+  };
+
+  const handleOnEscapeKeyDown = (event: KeyboardEvent) => {
+    if (!closeOnInteractOutside) event.preventDefault();
+  };
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent side="bottom" className="h-[90vh]">
+      <SheetContent
+        side="bottom"
+        className="h-[90vh]"
+        hideCloseButton={!showCloseButton}
+        onInteractOutside={handleOnInteractOutside}
+        onEscapeKeyDown={handleOnEscapeKeyDown}
+      >
         <SheetHeader className="pb-0">
           <SheetTitle>{title}</SheetTitle>
           {description && <SheetDescription>{description}</SheetDescription>}

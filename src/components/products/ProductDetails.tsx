@@ -2,6 +2,7 @@
 
 import { Label } from "@radix-ui/react-label";
 import React from "react";
+import { XIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { getURLDomain } from "@/lib/utils/url-helper";
 import ConfirmDialog from "../ui/ConfirmDialog";
@@ -16,12 +17,14 @@ interface ProductDetailsProps {
   product: ProductOrDraft;
   onEdit?: () => void;
   isDraftMode?: boolean;
+  closeSheet?: () => void;
 }
 
 function ProductDetails({
   product,
   onEdit,
   isDraftMode = false,
+  closeSheet,
 }: ProductDetailsProps) {
   const { deleteProduct, isSubmitting } = useSales();
   const { deleteProductDraft } = useProductDraft();
@@ -52,6 +55,16 @@ function ProductDetails({
   };
   return (
     <div className="px-4 flex flex-col gap-6 text-sm mb-4 overflow-hidden">
+      {closeSheet && (
+        <button
+          type="button"
+          onClick={closeSheet}
+          aria-label="Cerrar"
+          className="absolute top-4 right-4 rounded-xs opacity-70 hover:opacity-100 focus:outline-hidden"
+        >
+          <XIcon className="size-4" />
+        </button>
+      )}
       {onEdit && (
         <div className="flex gap-2">
           <Button onClick={onEdit}>Editar</Button>

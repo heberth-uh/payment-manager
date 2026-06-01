@@ -10,10 +10,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Resolver, useForm } from "react-hook-form";
-import {
-  SaleFormSchema,
-  SaleFormData,
-} from "@/lib/validations/sale.schema";
+import { SaleFormSchema, SaleFormData } from "@/lib/validations/sale.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
@@ -32,8 +29,7 @@ interface SaleFormProps {
 function SaleForm({ saleId, isEditing = false }: SaleFormProps) {
   const router = useRouter();
   const { drafts } = useProductDraft();
-  const { sale, isFetching, isSubmitting, getSale, createSale, updateSale } =
-    useSales();
+  const { sale, isFetching, getSale, createSale, updateSale } = useSales();
 
   const form = useForm<SaleFormData>({
     resolver: zodResolver(SaleFormSchema) as Resolver<SaleFormData>,
@@ -106,7 +102,7 @@ function SaleForm({ saleId, isEditing = false }: SaleFormProps) {
                     onChange={field.onChange}
                     value={field.value}
                     initialCustomer={isEditing ? sale?.customer : null}
-                    disabled={isFetching || isSubmitting}
+                    disabled={isFetching || form.formState.isSubmitting}
                   />
                 </FormControl>
                 <FormMessage />
@@ -118,6 +114,7 @@ function SaleForm({ saleId, isEditing = false }: SaleFormProps) {
           products={!isEditing ? drafts : sale?.products || []}
           saleId={saleId}
           isDraftMode={!isEditing}
+          disabled={isFetching || form.formState.isSubmitting}
         />
         <div className="grid gap-6">
           <FormField
@@ -144,12 +141,17 @@ function SaleForm({ saleId, isEditing = false }: SaleFormProps) {
             type="button"
             className="flex-1"
             variant="secondary"
+            disabled={form.formState.isSubmitting}
             onClick={() => router.back()}
           >
             Cancelar
           </Button>
-          <Button type="submit" className="flex-1">
-            Guardar
+          <Button
+            type="submit"
+            className="flex-1"
+            disabled={form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting ? "Guardando" : "Guardar"}
           </Button>
         </div>
       </form>

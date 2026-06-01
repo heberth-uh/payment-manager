@@ -67,6 +67,7 @@ function ProductView({
       product={product}
       isDraftMode={isDraftMode}
       onEdit={openEdit}
+      closeSheet={closeSheet}
     />
   );
 }

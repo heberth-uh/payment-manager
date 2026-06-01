@@ -59,6 +59,7 @@ function ProductForm({
       quantity: 1,
     },
   });
+  const { isDirty } = form.formState;
 
   // Calculate profit and subtotal for real-time display
   const unitPrice = form.watch("unitPrice") || 0;
@@ -76,7 +77,7 @@ function ProductForm({
         onClose?.();
         return;
       }
-      if (!form.formState.isDirty) {
+      if (!isDirty) {
         form.reset({
           name: product.name || "",
           url: product.url || "",
@@ -88,13 +89,13 @@ function ProductForm({
         });
       }
     }
-  }, [isEditing, product, form, onClose]);
+  }, [isEditing, product, form, isDirty, onClose]);
 
   // Handle form submission for both create and edit modes, as well as draft vs regular products
   const handleSave = form.handleSubmit(async (data) => {
     // In edit mode
     if (isEditing && product) {
-      if (!form.formState.isDirty) {
+      if (!isDirty) {
         onClose?.();
         return;
       }
@@ -334,7 +335,7 @@ function ProductForm({
               className="grow"
               disabled={form.formState.isSubmitting}
               onClick={(e) => {
-                if (!form.formState.isDirty) {
+                if (!isDirty) {
                   e.preventDefault();
                   handleOnCancel();
                 }

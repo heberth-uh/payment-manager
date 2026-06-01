@@ -10,10 +10,12 @@ import { Pencil, Trash } from "lucide-react";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { toast } from "sonner";
 import ProductListSection from "@/components/products/ProductListSection";
+import { formatDate } from "@/lib/utils/date";
 
 function SaleDetails({ id: saleId }: { id: string }) {
   const router = useRouter();
-  const { sale, isFetching, error, getSale, deleteSale } = useSales();
+  const { sale, isFetching, isSubmitting, error, getSale, deleteSale } =
+    useSales();
 
   useEffect(() => {
     if (saleId) {
@@ -69,13 +71,13 @@ function SaleDetails({ id: saleId }: { id: string }) {
 
       <div className="mb-2">
         <Label>Fecha de última venta</Label>
-        <p>
-          {sale?.lastSaleDate
-            ? new Date(sale.lastSaleDate).toLocaleString() // TODO: Create an utility function to formate dates
-            : "-"}
-        </p>
+        <p>{formatDate(sale?.lastSaleDate)}</p>
       </div>
-      <ProductListSection products={sale?.products || []} saleId={saleId} />
+      <ProductListSection
+        products={sale?.products || []}
+        saleId={saleId}
+        disabled={isFetching || isSubmitting}
+      />
 
       <div>
         <Label>Notas</Label>
@@ -89,7 +91,13 @@ function SaleDetails({ id: saleId }: { id: string }) {
           confirmText="Eliminar"
           actionConfirm={() => handleDeleteSale(saleId)}
         >
-          <Button type="button" variant="secondary" size="sm" title="Eliminar">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            title="Eliminar"
+            disabled={isSubmitting || isFetching}
+          >
             <Trash />
           </Button>
         </ConfirmDialog>
@@ -98,6 +106,7 @@ function SaleDetails({ id: saleId }: { id: string }) {
           size="sm"
           onClick={() => router.push(`/sales/edit/${saleId}`)}
           title="Editar"
+          disabled={isSubmitting || isFetching}
         >
           <Pencil />
         </Button>
