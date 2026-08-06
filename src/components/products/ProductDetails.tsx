@@ -50,8 +50,8 @@ function ProductDetails({
         toast.error("Ocurrió un error al eliminar este artículo");
         return;
       }
+      toast.success("Artículo eliminado");
     }
-    toast.success("Artículo eliminado");
   };
   return (
     <div className="px-4 flex flex-col gap-6 text-sm mb-4 overflow-hidden">
@@ -70,11 +70,14 @@ function ProductDetails({
           <Button onClick={onEdit}>Editar</Button>
           <ConfirmDialog
             actionConfirm={handleDelete}
-            title={"Eliminar artículo"}
+            title={isDraftMode ? "Quitar artículo" : "Eliminar artículo"}
             description={
-              "¿Estás seguro de que deseas eliminar este artículo? Esta acción no se puede deshacer."
+              isDraftMode
+                ? "Se quitará este artículo de la lista de artículos"
+                : "¿Estás seguro de que deseas eliminar este artículo? Esta acción no se puede deshacer."
             }
-            confirmText="Sí, eliminar"
+            confirmText={isDraftMode ? "Continuar" : "Sí, eliminar"}
+            isActionDanger={!isDraftMode}
           >
             <Button
               type="button"

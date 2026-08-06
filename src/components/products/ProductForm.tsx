@@ -99,12 +99,12 @@ function ProductForm({
         onClose?.();
         return;
       }
+      const changedData = getDirtyFields(form, data);
       // Editing draft product
       if (isDraftMode) {
-        updateProductDraft(product.id, data);
+        updateProductDraft(product.id, changedData);
       } else {
         // Editing product
-        const changedData = getDirtyFields(form, data);
         const result = await updateProduct(product.id, changedData);
         if (result.success) {
           toast.success("Producto actualizado con éxito");

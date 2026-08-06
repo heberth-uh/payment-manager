@@ -1,5 +1,15 @@
 import { z } from "zod";
-import { ProductDraftSchema } from "./product.schema";
+import {
+  CreateProductSchema,
+  ProductDraftSchema,
+  ProductPatchSchema,
+} from "./product.schema";
+
+const ProductChangesSchema = z.object({
+  create: z.array(CreateProductSchema).default([]),
+  update: z.array(ProductPatchSchema).default([]),
+  deleteIds: z.array(z.string()).default([]),
+});
 
 export const SaleFormSchema = z.object({
   status: z.enum(["PENDING", "PAID", "CANCELED"]).default("PENDING").optional(),
@@ -11,12 +21,17 @@ export const SaleFormSchema = z.object({
     .trim()
     .optional(),
   customerId: z.string().min(1, "El cliente es requerido"),
-  products: z.array(ProductDraftSchema).default([]), // Only consumed during sale creation; ignored on update
+  products: z.array(ProductDraftSchema).default([]),
 });
 
 // Server Schemas (will hold transforms)
 export const CreateSaleSchema = SaleFormSchema.extend({});
-export const UpdateSaleSchema = CreateSaleSchema.partial();
+export const UpdateSaleSchema = z.object({
+  customerId: z.string().min(1).optional(),
+  notes: z.string().max(500).trim().optional(),
+  status: z.enum(["PENDING", "PAID", "CANCELED"]).default("PENDING").optional(),
+  products: ProductChangesSchema.optional(),
+});
 
 // Pre-parse (fetch calls)
 export type CreateSaleInput = z.input<typeof CreateSaleSchema>;

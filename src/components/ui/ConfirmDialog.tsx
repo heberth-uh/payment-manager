@@ -18,6 +18,7 @@ interface ConfirmDialogProps {
   confirmText?: string;
   cancelText?: string;
   actionConfirm?: () => void;
+  isActionDanger?: boolean;
 }
 
 function ConfirmDialog({
@@ -27,6 +28,7 @@ function ConfirmDialog({
   confirmText = "Continuar",
   cancelText = "Cancelar",
   actionConfirm,
+  isActionDanger = true
 }: ConfirmDialogProps) {
   return (
     <AlertDialog>
@@ -38,7 +40,7 @@ function ConfirmDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{cancelText}</AlertDialogCancel>
-          <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={() => actionConfirm?.()}>
+          <AlertDialogAction className={`${isActionDanger && 'bg-red-600 hover:bg-red-700'}`} onClick={() => actionConfirm?.()}>
             {confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>

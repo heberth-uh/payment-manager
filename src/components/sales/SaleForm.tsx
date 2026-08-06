@@ -28,7 +28,8 @@ interface SaleFormProps {
 
 function SaleForm({ saleId, isEditing = false }: SaleFormProps) {
   const router = useRouter();
-  const { drafts } = useProductDraft();
+  const { drafts, loadDraftsFromProducts, getProductChanges } =
+    useProductDraft();
   const { sale, isFetching, getSale, createSale, updateSale } = useSales();
 
   const form = useForm<SaleFormData>({
@@ -54,8 +55,9 @@ function SaleForm({ saleId, isEditing = false }: SaleFormProps) {
         customerId: sale?.customerId || "",
         notes: sale?.notes || "",
       });
+      loadDraftsFromProducts(sale?.products || []);
     }
-  }, [isEditing, sale, form, saleId]);
+  }, [isEditing, sale, form, saleId, loadDraftsFromProducts]);
 
   if (isEditing && !sale && !isFetching) {
     return <p>No se encontró la venta</p>;
@@ -63,11 +65,28 @@ function SaleForm({ saleId, isEditing = false }: SaleFormProps) {
 
   const onsubmit = async (data: SaleFormData) => {
     if (isEditing && saleId) {
-      if (!form.formState.isDirty) {
+      const productChanges = getProductChanges();
+      if (!form.formState.isDirty && !productChanges.hasChanges) {
         router.push(`/sales/${saleId}`);
         return;
       }
-      const result = await updateSale(saleId, data);
+
+      // TODO: Get sale dirty values from getDirtyFields lib.
+
+      const saleData = {
+        customerId: data.customerId,
+        notes: data.notes,
+        status: data.status,
+        products: {
+          create: productChanges.create.map(({ id, ...rest }) => {
+            return { saleId: saleId, ...rest };
+          }),
+          update: productChanges.update,
+          deleteIds: productChanges.deleteIds,
+        },
+      };
+
+      const result = await updateSale(saleId, saleData);
       if (result.success) {
         toast.success("Venta actualizada con éxito");
         router.push(`/sales/${saleId}`);
@@ -111,9 +130,9 @@ function SaleForm({ saleId, isEditing = false }: SaleFormProps) {
           />
         </div>
         <ProductListSection
-          products={!isEditing ? drafts : sale?.products || []}
+          products={drafts}
           saleId={saleId}
-          isDraftMode={!isEditing}
+          isDraftMode
           disabled={isFetching || form.formState.isSubmitting}
         />
         <div className="grid gap-6">

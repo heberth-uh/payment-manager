@@ -38,9 +38,14 @@ export const ProductDraftSchema = ProductFormSchema.extend({
   profit: z.number().default(0),
 });
 
+// Patch shape (for updates, id is required, other fields are optional)
+export const ProductPatchSchema = ProductFormSchema.partial().extend({
+  id: z.string(),
+});
+
 // Server Schemas (will hold transforms)
 export const CreateProductSchema = ProductFormSchema.extend({
-  saleDate: saleDateSchema.transform(val => new Date(val)),
+  saleDate: saleDateSchema.transform((val) => new Date(val)),
   saleId: z.string().min(1, "La venta es requerida"),
 });
 export const UpdateProductSchema = CreateProductSchema.partial();
@@ -52,6 +57,7 @@ export type UpdateProductData = z.output<typeof UpdateProductSchema>;
 // Pre-parse (fetch calls)
 export type CreateProductInput = z.input<typeof CreateProductSchema>;
 export type UpdateProductInput = z.input<typeof UpdateProductSchema>;
+export type ProductPatchInput = z.input<typeof ProductPatchSchema>;
 
 // ProductDraftContext
 export type ProductDraftData = z.infer<typeof ProductDraftSchema>;
