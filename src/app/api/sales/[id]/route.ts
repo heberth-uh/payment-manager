@@ -112,9 +112,19 @@ export async function PUT(
       }
 
       // Sale update
-      return tx.sale.update({
+      if (products?.create.length) {
+        saleData.lastSaleDate = new Date();
+      }
+      if (Object.keys(saleData).length > 0) {
+        await tx.sale.update({
+          where: { id, userId: session.user.id },
+          data: saleData,
+        });
+      }
+
+      // Return fresh sale data
+      return tx.sale.findUniqueOrThrow({
         where: { id, userId: session.user.id },
-        data: saleData,
         include: { customer: true, products: true },
       });
     });

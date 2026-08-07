@@ -29,8 +29,9 @@ export const CreateSaleSchema = SaleFormSchema.extend({});
 export const UpdateSaleSchema = z.object({
   customerId: z.string().min(1).optional(),
   notes: z.string().max(500).trim().optional(),
-  status: z.enum(["PENDING", "PAID", "CANCELED"]).default("PENDING").optional(),
+  status: z.enum(["PENDING", "PAID", "CANCELED"]).optional(),
   products: ProductChangesSchema.optional(),
+  lastSaleDate: z.date().optional(),
 });
 
 // Pre-parse (fetch calls)

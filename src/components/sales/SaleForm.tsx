@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import ProductListSection from "../products/ProductListSection";
 import { useProductDraft } from "@/contexts/product/ProductDraftContext";
+import { getDirtyFields } from "@/lib/utils/form";
 
 interface SaleFormProps {
   saleId?: string;
@@ -40,6 +41,7 @@ function SaleForm({ saleId, isEditing = false }: SaleFormProps) {
       products: [],
     },
   });
+  const { isDirty } = form.formState;
 
   // Fetch sale data when in editing mode
   useEffect(() => {
@@ -50,14 +52,14 @@ function SaleForm({ saleId, isEditing = false }: SaleFormProps) {
 
   // Reset form with sale data when is fetched
   useEffect(() => {
-    if (isEditing && sale?.id === saleId && !form.formState.isDirty) {
+    if (isEditing && sale?.id === saleId && !isDirty) {
       form.reset({
         customerId: sale?.customerId || "",
         notes: sale?.notes || "",
       });
       loadDraftsFromProducts(sale?.products || []);
     }
-  }, [isEditing, sale, form, saleId, loadDraftsFromProducts]);
+  }, [isEditing, sale, form, isDirty, saleId, loadDraftsFromProducts]);
 
   if (isEditing && !sale && !isFetching) {
     return <p>No se encontró la venta</p>;
@@ -66,17 +68,14 @@ function SaleForm({ saleId, isEditing = false }: SaleFormProps) {
   const onsubmit = async (data: SaleFormData) => {
     if (isEditing && saleId) {
       const productChanges = getProductChanges();
-      if (!form.formState.isDirty && !productChanges.hasChanges) {
+      if (!isDirty && !productChanges.hasChanges) {
         router.push(`/sales/${saleId}`);
         return;
       }
 
-      // TODO: Get sale dirty values from getDirtyFields lib.
-
+      const changedData = getDirtyFields(form, data);
       const saleData = {
-        customerId: data.customerId,
-        notes: data.notes,
-        status: data.status,
+        ...changedData,
         products: {
           create: productChanges.create.map(({ id, ...rest }) => {
             return { saleId: saleId, ...rest };
