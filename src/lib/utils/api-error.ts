@@ -2,6 +2,19 @@ import { Prisma } from "@/generated/prisma/client";
 import { NextResponse } from "next/server";
 import z from "zod";
 
+/**
+ * Formats Zod issues into readable "path: message" strings, one per issue.
+ *
+ * @param issues - the `error.issues` array from a caught ZodError.
+ * @returns array of strings like `"products.0.saleDate: Invalid date"`.
+ */
+export function formatZodIssues(issues: z.core.$ZodIssue[]): string[] {
+  return issues.map((i) => {
+    const path = i.path.length ? i.path.join(".") : "(root)";
+    return `${path}: ${i.message}`;
+  });
+}
+
 export function handleApiError(error: unknown) {
   // Prisma known errors
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -26,6 +39,8 @@ export function handleApiError(error: unknown) {
 
   // Zod validation error
   if (error instanceof z.ZodError) {
+    const formatted = formatZodIssues(error.issues);
+    console.error("Validation error:", formatted);
     return NextResponse.json(
       { message: "Error de validación", errors: error.issues },
       { status: 400 }
