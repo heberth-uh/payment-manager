@@ -9,7 +9,7 @@ const saleDateSchema = z
     return year >= currentYear - 10 && year <= currentYear;
   }, `La fecha debe estar entre los últimos 10 años y el año actual`);
 
-// No transforms
+// UI - Form
 export const ProductFormSchema = z.object({
   name: z
     .string("El nombre es requerido")
@@ -32,35 +32,40 @@ export const ProductFormSchema = z.object({
     .positive("La cantidad debe ser mayor a 0"),
 });
 
+// UI - Draft
 export const ProductDraftSchema = ProductFormSchema.extend({
   id: z.string(),
   subtotal: z.number().default(0),
   profit: z.number().default(0),
 });
 
-// Patch shape (for updates, id is required, other fields are optional)
-export const ProductPatchSchema = ProductFormSchema.partial().extend({
-  id: z.string(),
-});
-
-// Server Schemas (will hold transforms)
+// API - Create
 export const CreateProductSchema = ProductFormSchema.extend({
   saleDate: saleDateSchema.transform((val) => new Date(val)),
   saleId: z.string().min(1, "La venta es requerida"),
 });
-export const UpdateProductSchema = CreateProductSchema.partial();
 
-// Post-parse (route handlers)
-export type CreateProductData = z.output<typeof CreateProductSchema>;
-export type UpdateProductData = z.output<typeof UpdateProductSchema>;
+// API - Update
+export const UpdateProductSchema = ProductFormSchema.partial();
 
-// Pre-parse (fetch calls)
-export type CreateProductInput = z.input<typeof CreateProductSchema>;
-export type UpdateProductInput = z.input<typeof UpdateProductSchema>;
-export type ProductPatchInput = z.input<typeof ProductPatchSchema>;
+// API - Sale Product Patch
+export const ProductPatchSchema = UpdateProductSchema.extend({
+  id: z.string(),
+});
 
-// ProductDraftContext
+// UI - Form
+export type ProductFormData = z.infer<typeof ProductFormSchema>;
+
+// UI - Draft
 export type ProductDraftData = z.infer<typeof ProductDraftSchema>;
 
-// RHF useForm
-export type ProductFormData = z.infer<typeof ProductFormSchema>;
+// API - Create
+export type CreateProductInput = z.input<typeof CreateProductSchema>;
+export type CreateProductData = z.output<typeof CreateProductSchema>;
+
+// API - Update
+export type UpdateProductInput = z.input<typeof UpdateProductSchema>;
+export type UpdateProductData = z.output<typeof UpdateProductSchema>;
+
+// API - Product Patch
+export type ProductPatchInput = z.input<typeof ProductPatchSchema>;

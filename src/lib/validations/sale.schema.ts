@@ -5,12 +5,14 @@ import {
   ProductPatchSchema,
 } from "./product.schema";
 
-const ProductChangesSchema = z.object({
+// API - Product Changes
+export const ProductChangesSchema = z.object({
   create: z.array(CreateProductSchema).default([]),
   update: z.array(ProductPatchSchema).default([]),
   deleteIds: z.array(z.string()).default([]),
 });
 
+// UI - Form
 export const SaleFormSchema = z.object({
   status: z.enum(["PENDING", "PAID", "CANCELED"]).default("PENDING").optional(),
   lastSaleDate: z.date().optional(),
@@ -24,8 +26,10 @@ export const SaleFormSchema = z.object({
   products: z.array(ProductDraftSchema).default([]),
 });
 
-// Server Schemas (will hold transforms)
-export const CreateSaleSchema = SaleFormSchema.extend({});
+// API - Create
+export const CreateSaleSchema = SaleFormSchema;
+
+// API - Update
 export const UpdateSaleSchema = z.object({
   customerId: z.string().min(1).optional(),
   notes: z.string().max(500).trim().optional(),
@@ -34,13 +38,13 @@ export const UpdateSaleSchema = z.object({
   lastSaleDate: z.date().optional(),
 });
 
-// Pre-parse (fetch calls)
-export type CreateSaleInput = z.input<typeof CreateSaleSchema>;
-export type UpdateSaleInput = z.input<typeof UpdateSaleSchema>;
-
-// Post-parse (route handlers)
-export type CreateSaleData = z.output<typeof CreateSaleSchema>;
-export type UpdateSaleData = z.output<typeof UpdateSaleSchema>;
-
 // RHF useForm
 export type SaleFormData = z.infer<typeof SaleFormSchema>;
+
+// API - Create
+export type CreateSaleInput = z.input<typeof CreateSaleSchema>;
+export type CreateSaleData = z.output<typeof CreateSaleSchema>;
+
+// API - Update
+export type UpdateSaleInput = z.input<typeof UpdateSaleSchema>;
+export type UpdateSaleData = z.output<typeof UpdateSaleSchema>;
