@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import ProductListSection from "../products/ProductListSection";
 import { useProductDraft } from "@/contexts/product/ProductDraftContext";
 import { getDirtyFields } from "@/lib/utils/form";
+import ConfirmDialog from "../ui/ConfirmDialog";
 
 interface SaleFormProps {
   saleId?: string;
@@ -155,15 +156,34 @@ function SaleForm({ saleId, isEditing = false }: SaleFormProps) {
           />
         </div>
         <div className="flex items-center justify-between gap-4">
-          <Button
-            type="button"
-            className="flex-1"
-            variant="secondary"
-            disabled={form.formState.isSubmitting}
-            onClick={() => router.back()}
+          <ConfirmDialog
+            title={
+              isEditing
+                ? "Cancelar edición de venta"
+                : "Cancelar creación de venta"
+            }
+            description="Se descartarán los cambios realizados."
+            actionConfirm={() => router.back()}
+            confirmText="Sí, cancelar"
+            cancelText={isEditing ? "Seguir editando" : "Seguir creando"}
+            isActionDanger={false}
           >
-            Cancelar
-          </Button>
+            <Button
+              type="button"
+              className="flex-1"
+              variant="secondary"
+              disabled={form.formState.isSubmitting}
+              onClick={(e) => {
+                const productChanges = getProductChanges();
+                if (!isDirty && !productChanges.hasChanges) {
+                  e.preventDefault();
+                  router.back();
+                }
+              }}
+            >
+              Cancelar
+            </Button>
+          </ConfirmDialog>
           <Button
             type="submit"
             className="flex-1"

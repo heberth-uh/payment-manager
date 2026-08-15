@@ -57,7 +57,7 @@ function ProductView({
   // No product to show
   if (!product) {
     return (
-      <div className="px-4 italic">No hay datos del artículo para mostrar</div>
+      <div className="px-4 italic">No hay datos del producto para mostrar</div>
     );
   }
 

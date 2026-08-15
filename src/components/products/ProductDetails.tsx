@@ -38,7 +38,7 @@ function ProductDetails({
   const handleDelete = async () => {
     if (!product.id) {
       toast.error(
-        "Ocurrió un problema al encontrar el artículo que deseas eliminar",
+        "Ocurrió un problema al encontrar el producto que deseas eliminar",
       );
       return;
     }
@@ -47,10 +47,10 @@ function ProductDetails({
     } else {
       const result = await deleteProduct(product.id);
       if (!result.success) {
-        toast.error("Ocurrió un error al eliminar este artículo");
+        toast.error("Ocurrió un error al eliminar este producto");
         return;
       }
-      toast.success("Artículo eliminado");
+      toast.success("Producto eliminado");
     }
   };
   return (
@@ -70,13 +70,13 @@ function ProductDetails({
           <Button onClick={onEdit}>Editar</Button>
           <ConfirmDialog
             actionConfirm={handleDelete}
-            title={isDraftMode ? "Quitar artículo" : "Eliminar artículo"}
+            title={isDraftMode ? "Quitar producto" : "Eliminar producto"}
             description={
               isDraftMode
-                ? "Se quitará este artículo de la lista de artículos"
-                : "¿Estás seguro de que deseas eliminar este artículo? Esta acción no se puede deshacer."
+                ? undefined
+                : "¿Deseas eliminar este producto? Esta acción no se puede deshacer."
             }
-            confirmText={isDraftMode ? "Continuar" : "Sí, eliminar"}
+            confirmText={isDraftMode ? "Continuar" : "Eliminar"}
             isActionDanger={!isDraftMode}
           >
             <Button
@@ -159,7 +159,7 @@ function ProductDetails({
       {product.url && (
         <div className="flex flex-col gap-2">
           <Label className="uppercase font-bold text-gray-400 tracking-wider">
-            Link del artículo
+            Link del producto
           </Label>
           <a
             href={product.url}

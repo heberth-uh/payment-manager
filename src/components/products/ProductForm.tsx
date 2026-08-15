@@ -73,7 +73,7 @@ function ProductForm({
   useEffect(() => {
     if (isEditing) {
       if (!product) {
-        toast.error("Ocurrió un error al cargar el artículo que desea editar");
+        toast.error("Ocurrió un error al cargar el producto que desea editar");
         onClose?.();
         return;
       }
@@ -145,7 +145,7 @@ function ProductForm({
     onCancel?.();
   };
 
-  // Enter submits from any input (skips textarea + IME composition).
+  // Enter key submits from any input (skips textarea + IME composition).
   // stopPropagation prevents the keydown from reaching the outer SaleForm.
   const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
     if (e.key !== "Enter") return;
@@ -325,9 +325,18 @@ function ProductForm({
         </div>
         <div className="flex justify-center items-center gap-4 border-t-2 py-4 shrink-0 px-4">
           <ConfirmDialog
-            title={isEditing ? "Cancelar edición" : "Cancelar creación"}
-            description="¿Estás seguro de cancelar? Se perderán los cambios no guardados."
+            title={
+              isEditing
+                ? "Cancelar edición de producto"
+                : "Cancelar creación de producto"
+            }
+            description={
+              isEditing ? "Se descartarán los cambios realizados." : undefined
+            }
             actionConfirm={handleOnCancel}
+            confirmText="Sí, cancelar"
+            cancelText={isEditing ? "Seguir editando" : "Seguir creando"}
+            isActionDanger={false}
           >
             <Button
               type="button"

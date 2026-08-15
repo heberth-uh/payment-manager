@@ -46,7 +46,7 @@ function ProductListSection({
             {products.map((product) => (
               <SideSheet
                 key={product.id}
-                title={"Detalles del artículo"}
+                title={"Detalles del producto"}
                 content={(closeSheet) => (
                   <ProductView
                     saleId={saleId}
