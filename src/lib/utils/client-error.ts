@@ -3,10 +3,14 @@
  * Handles Error instances and unknown error types.
  *
  * @param error - The error object (typically caught from try-catch)
- * @returns A string message. Returns error.message if Error instance, otherwise "Error desconocido"
+ * @param fallback - String for the optional message error to return as fallback
+ * @returns A string message. Returns error.message if Error instance, otherwise returns fallback
  */
-export function handleClientError(error: unknown) {
-  return error instanceof Error ? error.message : "Error desconocido";
+export function handleClientError(
+  error: unknown,
+  fallback = "Error desconocido",
+) {
+  return error instanceof Error ? error.message : fallback;
 }
 
 /**

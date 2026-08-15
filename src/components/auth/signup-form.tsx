@@ -67,7 +67,7 @@ export function SignupForm({
     });
 
     if (error) {
-      let errorMessage = error.message || "Something went wrong";
+      const errorMessage = error.message || "Something went wrong";
       toast.error(errorMessage);
       setError(errorMessage);
     } else {

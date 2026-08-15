@@ -25,6 +25,7 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useState } from "react";
+import { handleClientError } from "@/lib/utils/client-error";
 
 const signInSchema = z.object({
   email: z.email({ message: "Please enter a valid email" }),
@@ -64,8 +65,8 @@ export function LoginForm({
         toast.success("Logged successfully");
         router.push("/");
       }
-    } catch (err: any) {
-      const msg = err?.message || "Unexpected error during sign in";
+    } catch (err) {
+      const msg = handleClientError(err, "Unexpected error during sign in")
       toast.error(msg);
       setError(msg);
     }
