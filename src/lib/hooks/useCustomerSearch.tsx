@@ -1,5 +1,5 @@
 import { Customer } from "@/generated/prisma/client";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { handleClientError } from "../utils/client-error";
 import { customersApi } from "../api/customers";
 
@@ -15,19 +15,22 @@ export function useCustomerSearch(): UseCustomerSearchReturn {
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const searchCustomers = async (search?: string, limit?: number) => {
-    setError(null);
-    setIsFetching(true);
+  const searchCustomers = useCallback(
+    async (search?: string, limit?: number) => {
+      setError(null);
+      setIsFetching(true);
 
-    try {
-      const data = await customersApi.getAll(search, limit);
-      setCustomers(data);
-    } catch (error) {
-      setError(handleClientError(error));
-    } finally {
-      setIsFetching(false);
-    }
-  };
+      try {
+        const data = await customersApi.getAll(search, limit);
+        setCustomers(data);
+      } catch (error) {
+        setError(handleClientError(error));
+      } finally {
+        setIsFetching(false);
+      }
+    },
+    [],
+  );
 
   return {
     customers,

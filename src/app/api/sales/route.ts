@@ -4,6 +4,7 @@ import { handleApiError } from "@/lib/utils/api-error";
 import { getServerSession } from "@/lib/get-session";
 import { CreateSaleSchema } from "@/lib/validations/sale.schema";
 import { parseLocalDate } from "@/lib/utils/date";
+import { calculateProductTotals } from "@/lib/utils/productTotals";
 
 // Get all sales
 export async function GET(request: NextRequest) {
@@ -53,13 +54,19 @@ export async function POST(request: NextRequest) {
 
     const { products, ...saleData } = data;
 
-    const productsToCreate = data.products?.map((p) => ({
-      ...p,
-      saleDate: parseLocalDate(p.saleDate),
-      subtotal: p.unitPrice * p.quantity,
-      profit: (p.unitPrice - p.purchasePrice) * p.quantity,
-      userId: session.user.id,
-    }));
+    const productsToCreate = products?.map((p) => {
+      const { storedTotals } = calculateProductTotals(
+        p.unitPrice,
+        p.purchasePrice,
+        p.quantity,
+      );
+      return {
+        ...p,
+        ...storedTotals,
+        saleDate: parseLocalDate(p.saleDate),
+        userId: session.user.id,
+      };
+    });
 
     const result = await prisma.sale.create({
       data: {

@@ -6,7 +6,7 @@ import { CreateProductSchema } from "@/lib/validations/product.schema";
 import { NextRequest, NextResponse } from "next/server";
 
 // Get all products
-export async function GET(_req: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession();
 

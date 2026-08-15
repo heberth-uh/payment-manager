@@ -45,7 +45,7 @@ function CustomerCombobox({
     if (open) {
       searchCustomers(debouncedSearch, 5);
     }
-  }, [debouncedSearch, open]);
+  }, [debouncedSearch, open, searchCustomers]);
 
   // Set initial customer name if editing
   useEffect(() => {

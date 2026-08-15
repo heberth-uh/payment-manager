@@ -78,7 +78,7 @@ function SaleForm({ saleId, isEditing = false }: SaleFormProps) {
       const saleData = {
         ...changedData,
         products: {
-          create: productChanges.create.map(({ id, ...rest }) => {
+          create: productChanges.create.map(({ id: _id, ...rest }) => {
             return { saleId: saleId, ...rest };
           }),
           update: productChanges.update,
