@@ -1,3 +1,4 @@
+import { Prisma } from "@/generated/prisma/client";
 import { getServerSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
 import { handleApiError } from "@/lib/utils/api-error";
@@ -112,13 +113,14 @@ export async function PUT(
       }
 
       // Sale update
+      const saleUpdateData: Prisma.SaleUpdateInput = { ...saleData };
       if (products?.create.length) {
-        saleData.lastSaleDate = new Date();
+        saleUpdateData.lastSaleDate = new Date();
       }
-      if (Object.keys(saleData).length > 0) {
+      if (Object.keys(saleUpdateData).length > 0) {
         await tx.sale.update({
           where: { id, userId: session.user.id },
-          data: saleData,
+          data: saleUpdateData,
         });
       }
 

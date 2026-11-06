@@ -35,7 +35,6 @@ export const UpdateSaleSchema = z.object({
   notes: z.string().max(500).trim().optional(),
   status: z.enum(["PENDING", "PAID", "CANCELED"]).optional(),
   products: ProductChangesSchema.optional(),
-  lastSaleDate: z.date().optional(),
 });
 
 // RHF useForm
