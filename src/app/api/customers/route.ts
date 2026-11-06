@@ -22,15 +22,16 @@ export async function GET(request: NextRequest) {
     }
 
     const customers = await prisma.customer.findMany({
-      where: search
-        ? {
-            OR: [
-              { name: { contains: search, mode: "insensitive" } },
-              { lastname: { contains: search, mode: "insensitive" } },
-            ],
-            userId: session.user.id,
-          }
-        : undefined,
+      where: {
+        userId: session.user.id,
+        ...(search && {
+          OR: [
+            { name: { contains: search, mode: "insensitive" } },
+            { lastname: { contains: search, mode: "insensitive" } },
+          ],
+          userId: session.user.id,
+        }),
+      },
       take: limitParsed,
     });
 
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { message: "Customer created successfully", data: result },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     return handleApiError(error);

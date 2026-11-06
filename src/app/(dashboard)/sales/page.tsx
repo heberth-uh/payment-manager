@@ -41,9 +41,9 @@ function SalesPage() {
         <p>Cargando...</p>
       ) : sales.length === 0 ? (
         <div className="text-center p-12">
-          <p className="text-gray-500">No hay clientes todavía</p>
+          <p className="text-gray-500">No hay ventas todavía</p>
           <Button asChild className="mt-4">
-            <Link href="customers/new">Crear primer cliente</Link>
+            <Link href="sales/new">Crear primera venta</Link>
           </Button>
         </div>
       ) : (

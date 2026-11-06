@@ -17,17 +17,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
     const sales = await prisma.sale.findMany({
-      where: search
-        ? {
-            customer: {
-              OR: [
-                { name: { contains: search, mode: "insensitive" } },
-                { lastname: { contains: search, mode: "insensitive" } },
-              ],
-            },
-            userId: session.user.id,
-          }
-        : undefined,
+      where: {
+        userId: session.user.id,
+        ...(search && {
+          customer: {
+            OR: [
+              { name: { contains: search, mode: "insensitive" } },
+              { lastname: { contains: search, mode: "insensitive" } },
+            ],
+          },
+        }),
+      },
       include: { customer: true },
       orderBy: {
         lastSaleDate: "desc",
