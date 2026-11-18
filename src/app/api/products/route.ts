@@ -40,6 +40,16 @@ export async function POST(request: NextRequest) {
 
     // Validate the request body
     const data = CreateProductSchema.parse(body);
+
+    // Verify sale ownership
+    const sale = await prisma.sale.findUnique({
+      where: { id: data.saleId, userId: session.user.id },
+      select: { id: true },
+    });
+    if (!sale) {
+      return NextResponse.json({ message: "Sale not found" }, { status: 404 });
+    }
+
     // Get calculated fields object
     const { storedTotals } = calculateProductTotals(
       data.unitPrice,

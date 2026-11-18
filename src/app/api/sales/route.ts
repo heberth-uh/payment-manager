@@ -54,6 +54,18 @@ export async function POST(request: NextRequest) {
 
     const { products, ...saleData } = data;
 
+    // Verify customer ownership
+    const customer = await prisma.customer.findUnique({
+      where: { id: saleData.customerId, userId: session.user.id },
+      select: { id: true },
+    });
+    if (!customer) {
+      return NextResponse.json(
+        { message: "Customer not found" },
+        { status: 404 },
+      );
+    }
+
     const productsToCreate = products?.map((p) => {
       const { storedTotals } = calculateProductTotals(
         p.unitPrice,

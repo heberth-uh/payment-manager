@@ -57,7 +57,27 @@ export async function PUT(
     const parsed = UpdateSaleSchema.parse(body);
     const { products, ...saleData } = parsed;
 
+    // Verify customer ownership
+    if (saleData.customerId) {
+      const customer = await prisma.customer.findUnique({
+        where: { id: saleData.customerId, userId: session.user.id },
+        select: { id: true },
+      });
+      if (!customer) {
+        return NextResponse.json(
+          { message: "Customer not found" },
+          { status: 404 },
+        );
+      }
+    }
+
     const updatedSale = await prisma.$transaction(async (tx) => {
+      // Verify sale ownership
+      await tx.sale.findUniqueOrThrow({
+        where: { id, userId: session.user.id },
+        select: { id: true },
+      });
+
       // Product deletes
       if (products?.deleteIds.length) {
         await tx.product.deleteMany({
