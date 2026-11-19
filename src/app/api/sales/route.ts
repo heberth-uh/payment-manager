@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { handleApiError } from "@/lib/utils/api-error";
+import { handleApiError, unauthorizedResponse } from "@/lib/utils/api-error";
 import { getServerSession } from "@/lib/get-session";
 import { CreateSaleSchema } from "@/lib/validations/sale.schema";
 import { parseLocalDate } from "@/lib/utils/date";
@@ -14,8 +14,9 @@ export async function GET(request: NextRequest) {
 
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      return unauthorizedResponse();
     }
+
     const sales = await prisma.sale.findMany({
       where: {
         userId: session.user.id,
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession();
 
     if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      return unauthorizedResponse();
     }
 
     // Validate the request body
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
     });
     if (!customer) {
       return NextResponse.json(
-        { message: "Customer not found" },
+        { message: "Cliente no encontrado" },
         { status: 404 },
       );
     }

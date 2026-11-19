@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { handleApiError } from "@/lib/utils/api-error";
+import { handleApiError, unauthorizedResponse } from "@/lib/utils/api-error";
 import { CreateCustomerSchema } from "@/lib/validations/customer.schema";
 import { getServerSession } from "@/lib/get-session";
 
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      return unauthorizedResponse();
     }
 
     const customers = await prisma.customer.findMany({
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession();
 
     if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      return unauthorizedResponse();
     }
 
     // Validate the request body

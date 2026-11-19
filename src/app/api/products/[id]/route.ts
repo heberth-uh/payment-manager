@@ -1,6 +1,6 @@
 import { getServerSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
-import { handleApiError } from "@/lib/utils/api-error";
+import { handleApiError, unauthorizedResponse } from "@/lib/utils/api-error";
 import { calculateProductTotals } from "@/lib/utils/productTotals";
 import { UpdateProductSchema } from "@/lib/validations/product.schema";
 import { NextRequest, NextResponse } from "next/server";
@@ -15,7 +15,7 @@ export async function GET(
     const session = await getServerSession();
 
     if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      return unauthorizedResponse();
     }
 
     const product = await prisma.product.findUnique({
@@ -49,7 +49,7 @@ export async function PUT(
     const session = await getServerSession();
 
     if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      return unauthorizedResponse();
     }
 
     // Validate the request body
@@ -114,7 +114,7 @@ export async function DELETE(
     const session = await getServerSession();
 
     if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      return unauthorizedResponse();
     }
 
     const result = await prisma.product.delete({

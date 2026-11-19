@@ -22,17 +22,17 @@ export function handleApiError(error: unknown) {
       case "P2025":
         return NextResponse.json(
           { message: "Registro no encontrado" },
-          { status: 404 }
+          { status: 404 },
         );
       case "P2002":
         return NextResponse.json(
           { message: "Ya existe un registro con esos datos" },
-          { status: 409 }
+          { status: 409 },
         );
       default:
         return NextResponse.json(
           { message: "Error desconocido" },
-          { status: 500 }
+          { status: 500 },
         );
     }
   }
@@ -43,16 +43,26 @@ export function handleApiError(error: unknown) {
     console.error("Validation error:", formatted);
     return NextResponse.json(
       { message: "Error de validación", errors: error.issues },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   // Generic or unknown error
-  if (error instanceof Error) {
-    return NextResponse.json({ message: error.message }, { status: 500 });
-  }
+  console.error("Unhandled API error:", error);
   return NextResponse.json(
-    { message: "Internal Server Error" },
-    { status: 500 }
+    { message: "Error interno del servidor. Contacte al administrador." },
+    { status: 500 },
+  );
+}
+
+/**
+ * Builds the 401 response returned when there is no valid session.
+ *
+ * @returns NextResponse with the unauthorized message and 401 status code.
+ */
+export function unauthorizedResponse() {
+  return NextResponse.json(
+    { message: "Sesión no válida o expirada. Inicie sesión nuevamente." },
+    { status: 401 },
   );
 }

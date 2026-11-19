@@ -1,7 +1,7 @@
 import { Prisma } from "@/generated/prisma/client";
 import { getServerSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
-import { handleApiError } from "@/lib/utils/api-error";
+import { handleApiError, unauthorizedResponse } from "@/lib/utils/api-error";
 import { calculateProductTotals } from "@/lib/utils/productTotals";
 import { UpdateSaleSchema } from "@/lib/validations/sale.schema";
 import { NextRequest, NextResponse } from "next/server";
@@ -15,7 +15,7 @@ export async function GET(
     const { id } = await params;
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      return unauthorizedResponse();
     }
 
     const sale = await prisma.sale.findUnique({
@@ -50,7 +50,7 @@ export async function PUT(
     const session = await getServerSession();
 
     if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      return unauthorizedResponse();
     }
 
     // Validate the request body
@@ -65,7 +65,7 @@ export async function PUT(
       });
       if (!customer) {
         return NextResponse.json(
-          { message: "Customer not found" },
+          { message: "Cliente no encontrado" },
           { status: 404 },
         );
       }
@@ -93,14 +93,9 @@ export async function PUT(
           "purchasePrice" in changes ||
           "quantity" in changes;
         if (shouldRecalculateTotals) {
-          const currentProduct = await tx.product.findUnique({
+          const currentProduct = await tx.product.findUniqueOrThrow({
             where: { id: productId, saleId: id },
           });
-          if (!currentProduct) {
-            throw new Error(
-              `Product with id ${productId} not found for sale ${id}`,
-            );
-          }
           const merged = { ...currentProduct, ...changes };
           const { storedTotals } = calculateProductTotals(
             merged.unitPrice,
@@ -170,7 +165,7 @@ export async function DELETE(
     const session = await getServerSession();
 
     if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      return unauthorizedResponse();
     }
 
     const result = await prisma.sale.delete({
