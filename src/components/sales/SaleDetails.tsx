@@ -4,13 +4,13 @@ import React, { useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useSales } from "@/contexts/sale/SaleContext";
-import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash } from "lucide-react";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { toast } from "sonner";
 import ProductListSection from "@/components/products/ProductListSection";
 import { formatDate } from "@/lib/utils/date";
+import { ErrorState } from "../ui/ErrorState";
 
 function SaleDetails({ id: saleId }: { id: string }) {
   const router = useRouter();
@@ -34,10 +34,8 @@ function SaleDetails({ id: saleId }: { id: string }) {
     </span>
   );
 
-  if (!saleId) return <p>El ID de la venta es inválido</p>;
-
   if (error) {
-    return <PageContainer>Error {error}</PageContainer>; // TODO: Create Error component
+    return <ErrorState message={error} onRetry={() => getSale(saleId, true)} />;
   }
 
   const handleDeleteSale = async (id: string) => {
@@ -53,7 +51,7 @@ function SaleDetails({ id: saleId }: { id: string }) {
   return isFetching ? (
     <p>Cargando...</p>
   ) : (
-    <PageContainer>
+    <>
       <div className="flex justify-between items-center">
         <div>
           <Label>Cliente</Label>
@@ -111,7 +109,7 @@ function SaleDetails({ id: saleId }: { id: string }) {
           <Pencil />
         </Button>
       </div>
-    </PageContainer>
+    </>
   );
 }
 

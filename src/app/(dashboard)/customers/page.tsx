@@ -8,6 +8,7 @@ import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { toast } from "sonner";
 import { useCustomers } from "@/contexts/customer/CustomerContext";
 import { Pencil, RefreshCw, Trash } from "lucide-react";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 function CustomersPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -25,7 +26,11 @@ function CustomersPage() {
   }, [getCustomers]);
 
   if (error) {
-    return <PageContainer>Error {error}</PageContainer>;
+    return (
+      <PageContainer>
+        <ErrorState message={error} onRetry={() => getCustomers()} />
+      </PageContainer>
+    );
   }
 
   const handleDeleteCustomer = async (id: string) => {

@@ -9,6 +9,7 @@ import { useCustomers } from "@/contexts/customer/CustomerContext";
 import { MapPin, Pencil, Phone, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { ErrorState } from "../ui/ErrorState";
 
 function CustomerDetails({ id: customerId }: { id: string }) {
   const router = useRouter();
@@ -19,8 +20,14 @@ function CustomerDetails({ id: customerId }: { id: string }) {
     getCustomer(customerId);
   }, [customerId, getCustomer]);
 
-  if (!customerId) return <p>El ID del cliente es inválido</p>;
-  if (error) return <p>{error}</p>;
+  if (error) {
+    return (
+      <ErrorState
+        message={error}
+        onRetry={() => getCustomer(customerId, true)}
+      />
+    );
+  }
 
   const handleDeleteCustomer = async (id: string) => {
     const success = await deleteCustomer(id);

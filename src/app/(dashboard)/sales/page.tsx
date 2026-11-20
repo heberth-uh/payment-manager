@@ -2,6 +2,7 @@
 
 import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { useSales } from "@/contexts/sale/SaleContext";
 import { extractDateOnly } from "@/lib/utils/date";
 import { RefreshCw } from "lucide-react";
@@ -16,7 +17,11 @@ function SalesPage() {
   }, [getSales]);
 
   if (error) {
-    return <PageContainer>Error {error}</PageContainer>; // TODO: Create Error component
+    return (
+      <PageContainer>
+        <ErrorState message={error} onRetry={() => getSales()} />
+      </PageContainer>
+    );
   }
 
   return (
