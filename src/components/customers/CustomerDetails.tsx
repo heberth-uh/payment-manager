@@ -30,8 +30,8 @@ function CustomerDetails({ id: customerId }: { id: string }) {
   }
 
   const handleDeleteCustomer = async (id: string) => {
-    const success = await deleteCustomer(id);
-    if (success) {
+    const result = await deleteCustomer(id);
+    if (result.success) {
       toast.success("Se ha eliminado un cliente");
       router.push("/customers");
     } else {

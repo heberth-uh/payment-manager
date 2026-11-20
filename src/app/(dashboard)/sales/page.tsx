@@ -36,8 +36,8 @@ function SalesPage() {
           >
             <RefreshCw className={`size-4 ${isFetching && "animate-spin"}`} />
           </Button>
-          <Button>
-            <Link href="sales/new">Nuevo</Link>
+          <Button asChild>
+            <Link href="/sales/new">Nuevo</Link>
           </Button>
         </div>
       </div>
@@ -48,7 +48,7 @@ function SalesPage() {
         <div className="text-center p-12">
           <p className="text-gray-500">No hay ventas todavía</p>
           <Button asChild className="mt-4">
-            <Link href="sales/new">Crear primera venta</Link>
+            <Link href="/sales/new">Crear primera venta</Link>
           </Button>
         </div>
       ) : (
@@ -61,7 +61,8 @@ function SalesPage() {
                   className="flex justify-between items-center"
                 >
                   <p>
-                    {`${sale?.customer.name}${" " + sale?.customer.lastname}`}
+                    {sale?.customer.name}
+                    {sale?.customer.lastname && ` ${sale?.customer.lastname}`}
                   </p>
                   <p>
                     {sale?.lastSaleDate

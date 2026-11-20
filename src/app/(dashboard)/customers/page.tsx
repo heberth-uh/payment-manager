@@ -56,8 +56,8 @@ function CustomersPage() {
           >
             <RefreshCw className={`size-4 ${isFetching && "animate-spin"}`} />
           </Button>
-          <Button>
-            <Link href="customers/new">Nuevo</Link>
+          <Button asChild>
+            <Link href="/customers/new">Nuevo</Link>
           </Button>
         </div>
       </div>
@@ -68,7 +68,7 @@ function CustomersPage() {
         <div className="text-center p-12">
           <p className="text-gray-500">No hay clientes todavía</p>
           <Button asChild className="mt-4">
-            <Link href="customers/new">Crear primer cliente</Link>
+            <Link href="/customers/new">Crear primer cliente</Link>
           </Button>
         </div>
       ) : (
