@@ -1,14 +1,14 @@
 import { z } from "zod";
 import {
-  CreateProductSchema,
   ProductDraftSchema,
-  ProductPatchSchema,
+  SaleProductUpdateSchema,
+  SaleProductCreateSchema,
 } from "./product.schema";
 
 // API - Product Changes
 export const ProductChangesSchema = z.object({
-  create: z.array(CreateProductSchema).default([]),
-  update: z.array(ProductPatchSchema).default([]),
+  create: z.array(SaleProductCreateSchema).default([]),
+  update: z.array(SaleProductUpdateSchema).default([]),
   deleteIds: z.array(z.string()).default([]),
 });
 

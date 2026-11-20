@@ -48,8 +48,11 @@ export const CreateProductSchema = ProductFormSchema.extend({
 // API - Update
 export const UpdateProductSchema = ProductFormSchema.partial();
 
-// API - Sale Product Patch
-export const ProductPatchSchema = UpdateProductSchema.extend({
+// API - Sale Product Changes (ProductChangesSchema, used on sale update)
+export const SaleProductCreateSchema = CreateProductSchema.omit({
+  saleId: true,
+});
+export const SaleProductUpdateSchema = UpdateProductSchema.extend({
   id: z.string(),
 });
 
@@ -66,6 +69,3 @@ export type CreateProductData = z.output<typeof CreateProductSchema>;
 // API - Update
 export type UpdateProductInput = z.input<typeof UpdateProductSchema>;
 export type UpdateProductData = z.output<typeof UpdateProductSchema>;
-
-// API - Product Patch
-export type ProductPatchInput = z.input<typeof ProductPatchSchema>;
