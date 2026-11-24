@@ -78,8 +78,9 @@ model Customer {
   lastname  String?
   phone     String?
   address   String?
+  isActive  Boolean  @default(true)
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -104,7 +105,7 @@ model Sale {
   user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   // Customer relation
   customerId      String
-  customer        Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customer        Customer   @relation(fields: [customerId], references: [id], onDelete: NoAction)
   products        Product[]
 
   @@index([userId])

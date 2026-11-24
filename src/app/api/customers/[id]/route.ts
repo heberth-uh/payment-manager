@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 // Get a customer
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -24,13 +24,13 @@ export async function GET(
     if (!result) {
       return NextResponse.json(
         { message: "Cliente no encontrado" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     return NextResponse.json(
       { message: "Customer retrieved successfully", data: result },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return handleApiError(error);
@@ -40,7 +40,7 @@ export async function GET(
 // Edit a customer
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -71,7 +71,7 @@ export async function PUT(
 // Delete a customer
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -79,6 +79,21 @@ export async function DELETE(
 
     if (!session?.user) {
       return unauthorizedResponse();
+    }
+
+    // Block deleting a customer with sales
+    const hasSales = await prisma.sale.findFirst({
+      where: { customerId: id, userId: session.user.id },
+      select: { id: true },
+    });
+    if (hasSales) {
+      return NextResponse.json(
+        {
+          message:
+            "No se puede eliminar un cliente con ventas. Archívalo en su lugar.",
+        },
+        { status: 409 },
+      );
     }
 
     const result = await prisma.customer.delete({

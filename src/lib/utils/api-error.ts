@@ -29,6 +29,14 @@ export function handleApiError(error: unknown) {
           { message: "Ya existe un registro con esos datos" },
           { status: 409 },
         );
+      case "P2003":
+        return NextResponse.json(
+          {
+            message:
+              "No se puede completar la operación porque hay registros relacionados",
+          },
+          { status: 409 },
+        );
       default:
         return NextResponse.json(
           { message: "Error desconocido" },
