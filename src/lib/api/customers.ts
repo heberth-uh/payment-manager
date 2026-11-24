@@ -3,17 +3,34 @@ import {
   CreateCustomerInput,
   UpdateCustomerInput,
 } from "@/lib/validations/customer.schema";
+import { extractErrorMessage } from "../utils/client-error";
+
+export type GetCustomersParams = {
+  search?: string;
+  limit?: number;
+  archived?: boolean;
+};
 
 export const customersApi = {
   // GET ALL
-  async getAll(search?: string, limit?: number): Promise<Customer[]> {
-    const url = search
-      ? `/api/customers?search=${encodeURIComponent(search)}&limit=${limit}`
-      : `/api/customers?limit=${limit}`;
+  async getAll({
+    search,
+    limit,
+    archived,
+  }: GetCustomersParams = {}): Promise<Customer[]> {
+    const params = new URLSearchParams();
+    if (search) params.set("search", search);
+    if (limit) params.set("limit", limit.toString());
+    if (archived) params.set("archived", archived.toString());
+
+    const url = `/api/customers?${params.toString()}`;
     const response = await fetch(url);
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error al obtener clientes");
+      const message = await extractErrorMessage(
+        response,
+        "Error al obtener clientes",
+      );
+      throw new Error(message);
     }
     const result = await response.json();
     return result.data;
@@ -48,7 +65,7 @@ export const customersApi = {
   // UPDATE
   async update(
     customerId: string,
-    data: UpdateCustomerInput
+    data: UpdateCustomerInput,
   ): Promise<Customer> {
     const response = await fetch(`/api/customers/${customerId}`, {
       method: "PUT",

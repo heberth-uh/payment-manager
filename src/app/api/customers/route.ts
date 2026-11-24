@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search");
     const limit = searchParams.get("limit");
+    const archived = searchParams.get("archived");
     const session = await getServerSession();
 
     let limitParsed = limit ? parseInt(limit) : undefined;
@@ -24,13 +25,16 @@ export async function GET(request: NextRequest) {
     const customers = await prisma.customer.findMany({
       where: {
         userId: session.user.id,
+        isActive: archived !== "true",
         ...(search && {
           OR: [
             { name: { contains: search, mode: "insensitive" } },
             { lastname: { contains: search, mode: "insensitive" } },
           ],
-          userId: session.user.id,
         }),
+      },
+      orderBy: {
+        createdAt: "desc",
       },
       take: limitParsed,
     });

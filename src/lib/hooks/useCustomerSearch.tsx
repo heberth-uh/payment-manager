@@ -21,7 +21,7 @@ export function useCustomerSearch(): UseCustomerSearchReturn {
       setIsFetching(true);
 
       try {
-        const data = await customersApi.getAll(search, limit);
+        const data = await customersApi.getAll({ search, limit });
         setCustomers(data);
       } catch (error) {
         setError(handleClientError(error));

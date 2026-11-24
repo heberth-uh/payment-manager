@@ -57,7 +57,11 @@ export async function POST(request: NextRequest) {
 
     // Verify customer ownership
     const customer = await prisma.customer.findUnique({
-      where: { id: saleData.customerId, userId: session.user.id },
+      where: {
+        id: saleData.customerId,
+        isActive: true,
+        userId: session.user.id,
+      },
       select: { id: true },
     });
     if (!customer) {

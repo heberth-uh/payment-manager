@@ -41,6 +41,7 @@ export const ProductDraftSchema = ProductFormSchema.extend({
 
 // API - Create
 export const CreateProductSchema = ProductFormSchema.extend({
+  // TODO: Verify timezone shift: new Date("YYYY-MM-DD") parses as UTC midnight and may display one day earlier; likely needs parseLocalDate
   saleDate: saleDateSchema.transform((val) => new Date(val)),
   saleId: z.string().min(1, "La venta es requerida"),
 });

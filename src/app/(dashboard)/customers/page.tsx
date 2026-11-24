@@ -7,10 +7,16 @@ import { Button } from "@/components/ui/button";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { toast } from "sonner";
 import { useCustomers } from "@/contexts/customer/CustomerContext";
-import { Pencil, RefreshCw, Trash } from "lucide-react";
+import { Check, Pencil, RefreshCw, Trash } from "lucide-react";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Toggle } from "@/components/ui/toggle";
 
 function CustomersPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const archived = searchParams.get("archived") === "true";
+  const hasFilters = archived;
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const {
     customers,
@@ -22,13 +28,16 @@ function CustomersPage() {
   } = useCustomers();
 
   useEffect(() => {
-    getCustomers();
-  }, [getCustomers]);
+    getCustomers({ archived });
+  }, [getCustomers, archived]);
 
   if (error) {
     return (
       <PageContainer>
-        <ErrorState message={error} onRetry={() => getCustomers()} />
+        <ErrorState
+          message={error}
+          onRetry={() => getCustomers({ archived })}
+        />
       </PageContainer>
     );
   }
@@ -44,13 +53,30 @@ function CustomersPage() {
     }
   };
 
+  const toggleArchive = () => {
+    router.replace(archived ? "/customers" : "/customers?archived=true");
+  };
+
+  const emptyState = hasFilters ? (
+    <div className="text-center p-12">
+      <p className="text-gray-500">No se encontraron resultados</p>
+    </div>
+  ) : (
+    <div className="text-center p-12">
+      <p className="text-gray-500">No hay clientes todavía</p>
+      <Button asChild className="mt-4">
+        <Link href="/customers/new">Crear primer cliente</Link>
+      </Button>
+    </div>
+  );
+
   return (
     <PageContainer>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl">Clientes</h1>
         <div className="flex items-center gap-2">
           <Button
-            onClick={() => getCustomers()}
+            onClick={() => getCustomers({ archived })}
             variant="secondary"
             disabled={isFetching}
           >
@@ -62,15 +88,22 @@ function CustomersPage() {
         </div>
       </div>
 
+      <div className="flex items-center mt-2 gap-2">
+        <Toggle
+          variant="outline"
+          size="sm"
+          onPressedChange={toggleArchive}
+          pressed={archived}
+        >
+          Solo archivados
+          {archived && <Check className="size-4" />}
+        </Toggle>
+      </div>
+
       {isFetching && customers.length === 0 ? (
-        <p>Cargando...</p>
+        <p>Cargando...</p> // TODO: use a Skeleton screen
       ) : customers.length === 0 ? (
-        <div className="text-center p-12">
-          <p className="text-gray-500">No hay clientes todavía</p>
-          <Button asChild className="mt-4">
-            <Link href="/customers/new">Crear primer cliente</Link>
-          </Button>
-        </div>
+        emptyState
       ) : (
         <div className="mt-4">
           <ul className="flex flex-col gap-2">
@@ -86,7 +119,7 @@ function CustomersPage() {
                 {deletingId === customer.id ? (
                   <div className="flex items-center gap-2">
                     <span className="italic text-gray-600">Eliminando</span>
-                    <div className="size-3 rounded-full border-2 border-gray-600 border-t-transparent animate-spin animation-duration:[0.4s]"></div>
+                    <div className="size-3 rounded-full border-2 border-gray-600 border-t-transparent animate-spin animation-duration-[0.5s]"></div>
                   </div>
                 ) : (
                   <div className="flex gap-2">

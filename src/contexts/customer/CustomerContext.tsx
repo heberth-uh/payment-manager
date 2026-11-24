@@ -1,6 +1,6 @@
 "use client";
 
-import { customersApi } from "@/lib/api/customers";
+import { customersApi, GetCustomersParams } from "@/lib/api/customers";
 import { handleClientError } from "@/lib/utils/client-error";
 import {
   CreateCustomerInput,
@@ -21,12 +21,12 @@ export function CustomerProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   // GET ALL
-  const getCustomers = useCallback(async (search?: string) => {
+  const getCustomers = useCallback(async (params?: GetCustomersParams) => {
     setError(null);
     setIsFetching(true);
 
     try {
-      const data = await customersApi.getAll(search);
+      const data = await customersApi.getAll(params);
       setCustomers(data);
     } catch (error) {
       setError(handleClientError(error));

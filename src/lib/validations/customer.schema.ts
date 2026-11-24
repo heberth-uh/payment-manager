@@ -19,7 +19,9 @@ export const CustomerFormSchema = z.object({
 
 // Server Schemas (will hold transforms)
 export const CreateCustomerSchema = CustomerFormSchema.extend({});
-export const UpdateCustomerSchema = CreateCustomerSchema.partial();
+export const UpdateCustomerSchema = CreateCustomerSchema.partial().extend({
+  isActive: z.boolean().optional(),
+});
 
 // Pre-parse (fetch calls)
 export type CreateCustomerInput = z.input<typeof CreateCustomerSchema>;

@@ -50,7 +50,8 @@ function CustomerCombobox({
   // Set initial customer name if editing
   useEffect(() => {
     if (initialCustomer) {
-      const name = `${initialCustomer.name} ${initialCustomer.lastname}`;
+      const name =
+        `${initialCustomer.name} ${initialCustomer.lastname ?? ""}`.trim();
       setCustomerName(name);
     } else {
       setCustomerName("");
@@ -63,7 +64,8 @@ function CustomerCombobox({
       setCustomerName("");
     } else {
       onChange(currentValue);
-      setCustomerName(`${customer?.name} ${customer?.lastname}`);
+      const name = `${customer.name} ${customer.lastname ?? ""}`.trim();
+      setCustomerName(name);
     }
     setOpen(false);
   };
@@ -82,7 +84,7 @@ function CustomerCombobox({
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[100%] p-0">
+      <PopoverContent className="w-full p-0">
         <Command shouldFilter={false}>
           <CommandInput
             placeholder="Buscar un cliente"
@@ -107,7 +109,7 @@ function CustomerCombobox({
                   <Check
                     className={cn(
                       "ml-auto",
-                      value === customer.id ? "opacity-100" : "opacity-0"
+                      value === customer.id ? "opacity-100" : "opacity-0",
                     )}
                   />
                 </CommandItem>

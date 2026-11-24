@@ -60,7 +60,11 @@ export async function PUT(
     // Verify customer ownership
     if (saleData.customerId) {
       const customer = await prisma.customer.findUnique({
-        where: { id: saleData.customerId, userId: session.user.id },
+        where: {
+          id: saleData.customerId,
+          isActive: true,
+          userId: session.user.id,
+        },
         select: { id: true },
       });
       if (!customer) {

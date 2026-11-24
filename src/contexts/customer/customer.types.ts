@@ -4,6 +4,7 @@ import {
 } from "@/lib/validations/customer.schema";
 import { ActionResult } from "@/lib/types";
 import { Customer } from "@/generated/prisma/client";
+import { GetCustomersParams } from "@/lib/api/customers";
 
 export interface CustomerContextType {
   customers: Customer[];
@@ -11,7 +12,7 @@ export interface CustomerContextType {
   isFetching: boolean;
   isSubmitting: boolean;
   error: string | null;
-  getCustomers: (search?: string) => Promise<void>;
+  getCustomers: (params?: GetCustomersParams) => Promise<void>;
   getCustomer: (customerId: string, forceRefresh?: boolean) => Promise<void>;
   createCustomer: (data: CreateCustomerInput) => Promise<ActionResult<Customer>>;
   updateCustomer: (
