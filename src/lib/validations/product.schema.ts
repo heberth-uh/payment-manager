@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { parseDateOnly } from "@/lib/utils/date";
 
 const saleDateSchema = z
   .string()
@@ -41,13 +42,14 @@ export const ProductDraftSchema = ProductFormSchema.extend({
 
 // API - Create
 export const CreateProductSchema = ProductFormSchema.extend({
-  // TODO: Verify timezone shift: new Date("YYYY-MM-DD") parses as UTC midnight and may display one day earlier; likely needs parseLocalDate
-  saleDate: saleDateSchema.transform((val) => new Date(val)),
+  saleDate: saleDateSchema.transform(parseDateOnly),
   saleId: z.string().min(1, "La venta es requerida"),
 });
 
 // API - Update
-export const UpdateProductSchema = ProductFormSchema.partial();
+export const UpdateProductSchema = ProductFormSchema.partial().extend({
+  saleDate: saleDateSchema.transform(parseDateOnly).optional(),
+});
 
 // API - Sale Product Changes (ProductChangesSchema, used on sale update)
 export const SaleProductCreateSchema = CreateProductSchema.omit({

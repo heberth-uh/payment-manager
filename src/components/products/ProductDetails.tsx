@@ -8,7 +8,7 @@ import { getURLDomain } from "@/lib/utils/url-helper";
 import ConfirmDialog from "../ui/ConfirmDialog";
 import { useSales } from "@/contexts/sale/SaleContext";
 import { toast } from "sonner";
-import { extractDateOnly } from "@/lib/utils/date";
+import { formatDateOnly } from "@/lib/utils/date";
 import { ProductOrDraft } from "./types";
 import { useProductDraft } from "@/contexts/product/ProductDraftContext";
 import { calculateProductTotals } from "@/lib/utils/productTotals";
@@ -96,7 +96,7 @@ function ProductDetails({
           <Label className="uppercase font-bold text-gray-400 tracking-wider">
             Fecha de venta
           </Label>
-          <p>{extractDateOnly(product.saleDate)}</p>
+          <p>{formatDateOnly(product.saleDate)}</p>
         </div>
         <div className="flex flex-col gap-2">
           <Label className="uppercase font-bold text-gray-400 tracking-wider">

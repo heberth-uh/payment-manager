@@ -35,19 +35,14 @@ export function extractDateOnly(date: Date | string): string {
 }
 
 /**
- * Parses a local ISO date string (YYYY-MM-DD) into a Date object at local midnight.
- * Falls back to today's date if the input is undefined.
+ * Parses a date-only string (YYYY-MM-DD) as UTC midnight
+ * Date-only values are always stored and displayed in UTC to avoid day shifts.
  *
- * @param dateString - a date string in YYYY-MM-DD format, e.g. `"2026-05-31"`, or `undefined`.
- * @returns a Date object at local midnight (e.g. `Date "2026-05-31T00:00:00 local"`),
- *          or today's Date when the input is `undefined`.
+ * @param dateString - a date string in YYYY-MM-DD format, e.g. `"2026-11-15"`.
+ * @returns a Date at UTC midnight, e.g. `2026-11-15T00.00.000Z`.
  */
-export function parseLocalDate(dateString: string | undefined): Date {
-  if (!dateString) {
-    return new Date();
-  }
-  const [year, month, day] = dateString.split("-").map(Number);
-  return new Date(year, month - 1, day);
+export function parseDateOnly(dateString: string): Date {
+  return new Date(`${dateString}T00:00:00.000Z`);
 }
 
 /**
@@ -66,4 +61,17 @@ export function formatDate(date?: string | Date | null): string {
     return "-";
   }
   return parsedDate.toLocaleString();
+}
+
+/**
+ * Formats a date-only value (stored at UTC midnight) without shifting the day.
+ *
+ * @param date - a Date object, an ISO datetime string, `null` or `undefined`.
+ * @returns the local date, e.g. `"11/15/2026"`, or `"-"` when missing/invalid.
+ */
+export function formatDateOnly(date?: string | Date | null): string {
+  if (!date) return "-";
+  const parsed = typeof date === "string" ? new Date(date) : date;
+  if (Number.isNaN(parsed.getTime())) return "-";
+  return parsed.toLocaleDateString(undefined, { timeZone: "UTC" });
 }

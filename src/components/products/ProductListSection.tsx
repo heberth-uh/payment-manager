@@ -3,6 +3,7 @@ import SideSheet from "../ui/SideSheet";
 import ProductView from "./ProductView";
 import { Button } from "../ui/button";
 import { ProductOrDraft } from "./types";
+import { formatDateOnly } from "@/lib/utils/date";
 
 interface ProductListSectionProps {
   products: ProductOrDraft[];
@@ -64,7 +65,7 @@ function ProductListSection({
                   <div className="w-4/5 space-y-1">
                     <p className="text-sm line-clamp-1">{product.name}</p>
                     <div className="flex justify-between items-center text-xs italic">
-                      <p>{product.saleDate.toLocaleString()}</p>
+                      <p>{formatDateOnly(product.saleDate)}</p>
                     </div>
                   </div>
                   <div className="w-1/5 text-right">

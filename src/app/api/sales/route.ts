@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { handleApiError, unauthorizedResponse } from "@/lib/utils/api-error";
 import { getServerSession } from "@/lib/get-session";
 import { CreateSaleSchema } from "@/lib/validations/sale.schema";
-import { parseLocalDate } from "@/lib/utils/date";
+import { parseDateOnly } from "@/lib/utils/date";
 import { calculateProductTotals } from "@/lib/utils/productTotals";
 
 // Get all sales
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       return {
         ...p,
         ...storedTotals,
-        saleDate: parseLocalDate(p.saleDate),
+        saleDate: parseDateOnly(p.saleDate),
         userId: session.user.id,
       };
     });
