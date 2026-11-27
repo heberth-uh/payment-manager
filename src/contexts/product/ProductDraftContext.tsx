@@ -63,7 +63,7 @@ export function ProductDraftProvider({
       );
     const update = [...draftUpdates]
       .filter(([id]) => seededDrafts.has(id))
-      .map(([id, { subtotal: _s, profit: _p, ...changes }]) => ({
+      .map(([id, { subtotal: _subtotal, profit: _profit, ...changes }]) => ({
         id,
         ...changes,
       }));

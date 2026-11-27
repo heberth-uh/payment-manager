@@ -4,6 +4,8 @@ import { handleApiError, unauthorizedResponse } from "@/lib/utils/api-error";
 import { CreateCustomerSchema } from "@/lib/validations/customer.schema";
 import { getServerSession } from "@/lib/get-session";
 
+const MAX_LIMIT = 50;
+
 // Get all customers
 export async function GET(request: NextRequest) {
   try {
@@ -13,10 +15,11 @@ export async function GET(request: NextRequest) {
     const archived = searchParams.get("archived");
     const session = await getServerSession();
 
-    let limitParsed = limit ? parseInt(limit) : undefined;
-    if (isNaN(limitParsed!)) {
-      limitParsed = undefined;
-    }
+    const parsedLimit = Number(limit);
+    const take =
+      Number.isInteger(parsedLimit) && parsedLimit > 0
+        ? Math.min(parsedLimit, MAX_LIMIT)
+        : undefined;
 
     if (!session?.user) {
       return unauthorizedResponse();
@@ -36,7 +39,7 @@ export async function GET(request: NextRequest) {
       orderBy: {
         createdAt: "desc",
       },
-      take: limitParsed,
+      take,
     });
 
     return NextResponse.json({ data: customers }, { status: 200 });

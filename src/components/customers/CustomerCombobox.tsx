@@ -22,6 +22,8 @@ import { useCustomerSearch } from "@/lib/hooks/useCustomerSearch";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import { Customer } from "@/generated/prisma/client";
 
+const SEARCH_LIMIT = 5;
+
 interface ComboboxProps {
   value: string;
   onChange: (value: string) => void;
@@ -43,7 +45,7 @@ function CustomerCombobox({
 
   useEffect(() => {
     if (open) {
-      searchCustomers(debouncedSearch, 5);
+      searchCustomers(debouncedSearch, SEARCH_LIMIT);
     }
   }, [debouncedSearch, open, searchCustomers]);
 

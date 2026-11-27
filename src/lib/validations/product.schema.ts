@@ -1,14 +1,11 @@
 import { z } from "zod";
 import { parseDateOnly } from "@/lib/utils/date";
 
-const saleDateSchema = z
-  .string()
-  .min(1, "La fecha es requerida")
-  .refine((val) => {
-    const year = new Date(val).getFullYear();
-    const currentYear = new Date().getFullYear();
-    return year >= currentYear - 10 && year <= currentYear;
-  }, `La fecha debe estar entre los últimos 10 años y el año actual`);
+const saleDateSchema = z.iso.date("La fecha es inválida").refine((val) => {
+  const year = Number(val.slice(0, 4));
+  const currentYear = new Date().getFullYear();
+  return year >= currentYear - 10 && year <= currentYear;
+}, `La fecha debe estar entre los últimos 10 años y el año actual`);
 
 // UI - Form
 export const ProductFormSchema = z.object({
