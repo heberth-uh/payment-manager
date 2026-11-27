@@ -68,6 +68,7 @@ function SaleForm({ saleId, isEditing = false }: SaleFormProps) {
 
   const onsubmit = async (data: SaleFormData) => {
     if (isEditing && saleId) {
+      // Edit
       const productChanges = getProductChanges();
       if (!isDirty && !productChanges.hasChanges) {
         router.push(`/sales/${saleId}`);
@@ -78,7 +79,7 @@ function SaleForm({ saleId, isEditing = false }: SaleFormProps) {
       const saleData = {
         ...changedData,
         products: {
-          create: productChanges.create.map(({ id: _id, ...rest }) => rest),
+          create: productChanges.create,
           update: productChanges.update,
           deleteIds: productChanges.deleteIds,
         },
@@ -92,7 +93,11 @@ function SaleForm({ saleId, isEditing = false }: SaleFormProps) {
         toast.error(result.error);
       }
     } else {
-      const saleData = { ...data, products: drafts };
+      // Create
+      const saleData = {
+        ...data,
+        products: getProductChanges().create,
+      };
       const result = await createSale(saleData);
       if (result.success) {
         toast.success("Nueva venta creada");

@@ -1,17 +1,17 @@
 "use client";
 
-import {
-  ProductDraftData,
-  ProductFormData,
-} from "@/lib/validations/product.schema";
-import { calculateProductTotals } from "@/lib/utils/productTotals";
-import { createContext, useCallback, useContext, useState } from "react";
 import { Product } from "@/generated/prisma/client";
+import { stripUnchangedFields } from "@/lib/utils/draft";
 import {
   buildProductDraftPatch,
   productToDraft,
 } from "@/lib/utils/productDraft";
-import { stripUnchangedFields } from "@/lib/utils/draft";
+import { calculateProductTotals } from "@/lib/utils/productTotals";
+import {
+  ProductDraftData,
+  ProductFormData,
+} from "@/lib/validations/product.schema";
+import { createContext, useCallback, useContext, useState } from "react";
 
 interface ProductDraftContextType {
   drafts: ProductDraftData[];
@@ -22,8 +22,8 @@ interface ProductDraftContextType {
   deleteProductDraft: (id: string) => void;
   loadDraftsFromProducts: (products: Product[]) => void;
   getProductChanges: () => {
-    create: ProductDraftData[];
-    update: (Partial<ProductDraftData> & { id: string })[];
+    create: ProductFormData[];
+    update: (Partial<ProductFormData> & { id: string })[];
     deleteIds: string[];
     hasChanges: boolean;
   };
@@ -56,10 +56,14 @@ export function ProductDraftProvider({
   const getProductChanges = () => {
     const draftIds = new Set(drafts.map((d) => d.id));
 
-    const create = drafts.filter((d) => !seededDrafts.has(d.id));
+    const create = drafts
+      .filter((d) => !seededDrafts.has(d.id))
+      .map(
+        ({ id: _id, subtotal: _subtotal, profit: _profit, ...rest }) => rest,
+      );
     const update = [...draftUpdates]
       .filter(([id]) => seededDrafts.has(id))
-      .map(([id, changes]) => ({
+      .map(([id, { subtotal: _s, profit: _p, ...changes }]) => ({
         id,
         ...changes,
       }));

@@ -14,9 +14,6 @@ export const ProductChangesSchema = z.object({
 
 // UI - Form
 export const SaleFormSchema = z.object({
-  status: z.enum(["PENDING", "PAID", "CANCELED"]).default("PENDING").optional(),
-  lastSaleDate: z.date().optional(),
-  lastPaymentDate: z.date().optional(),
   notes: z
     .string()
     .max(500, "Las notas no pueden exceder 500 caracteres")
@@ -27,7 +24,15 @@ export const SaleFormSchema = z.object({
 });
 
 // API - Create
-export const CreateSaleSchema = SaleFormSchema;
+export const CreateSaleSchema = z.object({
+  customerId: z.string().min(1, "El cliente es requerido"),
+  notes: z
+    .string()
+    .max(500, "Las notas no pueden exceder 500 caracteres")
+    .trim()
+    .optional(),
+  products: z.array(SaleProductCreateSchema).default([]),
+});
 
 // API - Update
 export const UpdateSaleSchema = z.object({

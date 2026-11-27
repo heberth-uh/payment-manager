@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { handleApiError, unauthorizedResponse } from "@/lib/utils/api-error";
 import { getServerSession } from "@/lib/get-session";
 import { CreateSaleSchema } from "@/lib/validations/sale.schema";
-import { parseDateOnly } from "@/lib/utils/date";
 import { calculateProductTotals } from "@/lib/utils/productTotals";
 
 // Get all sales
@@ -71,7 +70,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const productsToCreate = products?.map((p) => {
+    const productsToCreate = products.map((p) => {
       const { storedTotals } = calculateProductTotals(
         p.unitPrice,
         p.purchasePrice,
@@ -80,7 +79,6 @@ export async function POST(request: NextRequest) {
       return {
         ...p,
         ...storedTotals,
-        saleDate: parseDateOnly(p.saleDate),
         userId: session.user.id,
       };
     });
@@ -89,8 +87,7 @@ export async function POST(request: NextRequest) {
       data: {
         ...saleData,
         userId: session.user.id,
-        ...(productsToCreate &&
-          productsToCreate.length > 0 && {
+        ...(products.length > 0 && {
             products: { create: productsToCreate },
           }),
       },
