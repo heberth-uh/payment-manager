@@ -20,6 +20,7 @@ model User {
   customers     Customer[]
   sales         Sale[]
   products      Product[]
+  payments      Payment[]
 
   @@unique([email])
   @@map("user")
@@ -107,6 +108,7 @@ model Sale {
   customerId      String
   customer        Customer   @relation(fields: [customerId], references: [id], onDelete: NoAction)
   products        Product[]
+  payments        Payment[]
 
   @@index([userId])
   @@map("sale")
@@ -123,7 +125,7 @@ model Product {
   purchasePrice Float
   unitPrice     Float
   quantity      Int      @default(1)
-  subtotal      Float // purchasePrice * quantity
+  subtotal      Float // unitPrice * quantity
   profit        Float // (unitPrice - purchasePrice) * quantity
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -138,6 +140,24 @@ model Product {
   @@map("product")
 }
 
+// ---------- Payments ----------
+model Payment {
+  id          String        @id @default(cuid())
+  amount      Float
+  method      PaymentMethod
+  paymentDate DateTime
+  note        String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  saleId      String
+  sale        Sale          @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([saleId])
+  @@map("payment")
+}
+
 // ---------------------------
 // Enums
 // ---------------------------
@@ -146,4 +166,10 @@ enum SaleStatus {
   PENDING
   PAID
   CANCELED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
 }
