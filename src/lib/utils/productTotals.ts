@@ -1,4 +1,4 @@
-const round2 = (n: number) => Math.round(n * 100) / 100;
+export const round2 = (n: number) => Math.round(n * 100) / 100;
 
 /**
  * Calculates product totals and metrics based on pricing and quantity.
